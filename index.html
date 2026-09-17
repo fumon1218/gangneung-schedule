@@ -252,6 +252,7 @@
       <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;">
       <button class="btn" id="btnMyRooms">⭐ 내 담당 실</button>
       <button class="btn danger" id="btnReset">초기 데이터로 재설정</button>
+      <button class="btn danger" id="btnClearAll">🗑 전체 비우기</button>
     </div>
   </div>
 
@@ -1836,6 +1837,23 @@ document.getElementById('btnReset').onclick = async ()=>{
       })));
     }catch(e){ console.warn('shared reset failed', e); }
   }
+};
+document.getElementById('btnClearAll').onclick = async ()=>{
+  const msg = dbAvailable
+    ? '⚠️ 예시 데이터를 포함한 모든 일정을 완전히 삭제해서 빈 상태로 만듭니다. 이 작업은 되돌릴 수 없습니다.\n(다른 곳에서 CSV로 내보낸 데이터를 깨끗하게 새로 불러올 때 사용하세요)'
+    : '모든 일정을 완전히 삭제해서 빈 상태로 만들까요? 되돌릴 수 없습니다.';
+  const ok = await askConfirm(msg, {danger:true, okText:'전체 삭제'});
+  if(!ok) return;
+  const oldIds = entries.map(e=>e.id);
+  entries = [];
+  persist();
+  renderAll();
+  if(dbAvailable){
+    try{
+      await Promise.all(oldIds.map(id=>dbApi.collection('entries').doc(id).delete().catch(()=>{})));
+    }catch(e){ console.warn('clear all failed', e); }
+  }
+  await askAlert('모두 삭제했습니다. 이제 "CSV 업로드"로 새 데이터를 불러올 수 있습니다.');
 };
 
 /* ================= MASTER RENDER ================= */
