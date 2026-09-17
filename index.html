@@ -36,12 +36,13 @@
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box;}
+  html{overflow-x:hidden;}
   body{
     margin:0; background:var(--bg); color:var(--text);
     font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-    padding:28px 20px 80px;
+    padding:28px 20px 80px; overflow-x:hidden;
   }
-  .wrap{max-width:1320px; margin:0 auto;}
+  .wrap{max-width:1320px; margin:0 auto; min-width:0;}
   .eyebrow{
     text-align:center; letter-spacing:.22em; font-size:11px; font-weight:700;
     color:var(--text-faint); margin-bottom:10px; text-transform:uppercase;
@@ -133,19 +134,20 @@
   /* ---- calendar ---- */
   .cal-head{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px;}
   .cal-head h3{margin:0; font-size:20px; font-weight:900;}
-  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
-  .cal-dow{text-align:center; font-size:12px; font-weight:700; color:var(--text-dim); padding-bottom:4px;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; width:100%;}
+  .cal-dow{text-align:center; font-size:12px; font-weight:700; color:var(--text-dim); padding-bottom:4px; min-width:0;}
   .cal-dow.sun{color:var(--danger);} .cal-dow.sat{color:var(--accent);}
   .cal-day{
     background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; min-height:118px;
-    display:flex; flex-direction:column; gap:5px; cursor:pointer; transition:.12s;
+    display:flex; flex-direction:column; gap:5px; cursor:pointer; transition:.12s; min-width:0; overflow:hidden;
   }
   .cal-day:hover{border-color:var(--accent); box-shadow:var(--shadow);}
   .cal-day.empty{background:transparent; border:none; cursor:default;}
-  .cal-day .dnum{display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13px;}
+  .cal-day .dnum{display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13px; min-width:0; gap:4px;}
+  .cal-day .dnum span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .cal-day .dnum.sun{color:var(--danger);} .cal-day .dnum.sat{color:var(--accent);}
-  .cal-count{ font-size:10.5px; font-weight:800; background:#1a1f28; color:#fff; border-radius:999px; padding:1px 7px;}
-  .cal-item{ font-size:10.5px; padding:2px 6px; border-radius:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
+  .cal-count{ font-size:10.5px; font-weight:800; background:#1a1f28; color:#fff; border-radius:999px; padding:1px 7px; flex:none; white-space:nowrap;}
+  .cal-item{ font-size:10.5px; padding:2px 6px; border-radius:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; min-width:0;}
   .cal-more{ font-size:10px; color:var(--text-faint); text-align:center; margin-top:2px;}
   .cal-empty-label{font-size:11px; color:var(--text-faint); text-align:center; margin-top:auto; margin-bottom:auto;}
 
@@ -219,6 +221,17 @@
     }
     #view-table tbody td[data-label="일자"]{ font-size:14px; border-bottom:1px dashed var(--border); padding-bottom:8px; margin-bottom:2px; }
     #view-table tbody td .rowops{ width:100%; justify-content:flex-end; }
+
+    /* 캘린더를 모바일 화면 폭에 맞게 압축 */
+    #view-calendar{ padding:12px 8px !important; }
+    .cal-grid{ gap:4px; }
+    .cal-day{ min-height:64px; padding:4px; border-radius:8px; gap:2px; }
+    .cal-day .dnum{ font-size:11px; }
+    .cal-count{ font-size:8.5px; padding:1px 4px; }
+    .cal-item{ font-size:8.5px; padding:1px 3px; border-radius:4px; }
+    .cal-more, .cal-empty-label{ font-size:8.5px; }
+    .cal-dow{ font-size:10px; }
+    .cal-head h3{ font-size:16px; }
   }
 </style>
 </head>
