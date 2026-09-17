@@ -6,6 +6,9 @@
 <title>강릉분원 정규 프로그램 일정표</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<!-- Firebase (GitHub Pages 등 claude.ai 밖에서 팀 실시간 공유를 위해 사용. claude.ai 아티팩트에서는 사용되지 않습니다) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg:#f4f6f9; --card:#ffffff; --border:#e5e9f0; --border-strong:#d7dce5;
@@ -700,7 +703,8 @@ function setCollabBadge(mode, peerCount){
   const el = document.getElementById('collabBadge');
   if(!el) return;
   if(mode==='shared'){
-    el.textContent = `🟢 조직과 실시간 공유 중${(peerCount!=null)? ' · 현재 '+peerCount+'명 접속':''}`;
+    const label = collabBackend==='firebase' ? '🟢 팀과 실시간 공유 중 (Firebase)' : `🟢 조직과 실시간 공유 중${(peerCount!=null)? ' · 현재 '+peerCount+'명 접속':''}`;
+    el.textContent = label;
     el.style.background = 'var(--green-dim)'; el.style.color = 'var(--green)';
   }else if(mode==='connecting'){
     el.textContent = '⏳ 공유 저장소 확인 중...';
@@ -775,6 +779,21 @@ function initPresence(){
   }catch(e){ setCollabBadge('shared'); }
 }
 
+/* ===== Firebase 설정 (GitHub Pages 등 claude.ai 밖에서 팀 실시간 공유용) =====
+   Firebase 콘솔(console.firebase.google.com)에서 프로젝트를 만들고
+   "웹 앱 추가"로 받은 설정값을 아래에 그대로 붙여넣으세요.
+   비워두면(값이 없으면) 이 기능은 자동으로 꺼지고 예전처럼 브라우저 저장만 사용합니다. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAgrtE13iz1nwZcbgbf9gHohZrP-cxJiWE",
+  authDomain: "gangneung-schedule.firebaseapp.com",
+  projectId: "gangneung-schedule",
+  storageBucket: "gangneung-schedule.firebasestorage.app",
+  messagingSenderId: "912914783068",
+  appId: "1:912914783068:web:55c5bba766519967013f99"
+};
+const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
+let collabBackend = null; // 'claude' | 'firebase'
+
 async function initCollab(){
   setCollabBadge('connecting');
   try{
@@ -782,23 +801,35 @@ async function initCollab(){
       downloadsApi = await window.claude.use('downloads');
     }
   }catch(e){ downloadsApi = null; }
+
   try{
     if(window.claude && typeof window.claude.use === 'function'){
       dbApi = await window.claude.use('db');
+      collabBackend = 'claude';
+    }else if(FIREBASE_ENABLED && window.firebase){
+      firebase.initializeApp(FIREBASE_CONFIG);
+      dbApi = firebase.firestore();
+      collabBackend = 'firebase';
     }
-  }catch(e){ dbApi = null; }
+  }catch(e){ dbApi = null; collabBackend = null; console.warn('collab init failed', e); }
+
   if(!dbApi){ setCollabBadge('local'); dbAvailable = false; return; }
   dbAvailable = true;
   subscribeEntriesDb();
   subscribeRoomsDb();
   subscribeTemplatesDb();
   subscribeDayNotesDb();
-  try{
-    if(window.claude && typeof window.claude.use === 'function'){
-      roomApi = await window.claude.use('room');
-    }
-  }catch(e){ roomApi = null; }
-  initPresence();
+
+  if(collabBackend === 'claude'){
+    try{
+      if(window.claude && typeof window.claude.use === 'function'){
+        roomApi = await window.claude.use('room');
+      }
+    }catch(e){ roomApi = null; }
+    initPresence();
+  }else{
+    setCollabBadge('shared'); // Firebase 모드에서는 접속자 수 표시는 생략
+  }
 }
 
 /* ================= CSV EXPORT ================= */
@@ -824,14 +855,24 @@ async function exportCsv(){
   const csv = buildCsv(rows);
   const today = new Date();
   const fname = `강릉분원_일정_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.csv`;
-  if(!downloadsApi){
-    await askAlert('이 화면에서는 파일 다운로드를 사용할 수 없습니다. claude.ai 아티팩트 화면에서 다시 시도해주세요.');
+  if(downloadsApi){
+    try{
+      await downloadsApi.save({ filename: fname, data: csv });
+    }catch(e){
+      if(e && e.code==='declined') return;
+      await askAlert('다운로드에 실패했습니다: ' + (e && e.message ? e.message : '알 수 없는 오류'));
+    }
     return;
   }
+  // claude.ai 밖(예: GitHub Pages)에서는 일반 브라우저 다운로드 방식 사용
   try{
-    await downloadsApi.save({ filename: fname, data: csv });
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
   }catch(e){
-    if(e && e.code==='declined') return;
     await askAlert('다운로드에 실패했습니다: ' + (e && e.message ? e.message : '알 수 없는 오류'));
   }
 }
