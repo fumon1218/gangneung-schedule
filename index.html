@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>강릉분원 정규 프로그램 일정표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --border:#e5e9f0; --border-strong:#d7dce5;
+    --text:#1b2432; --text-dim:#6b7686; --text-faint:#9aa4b2;
+    --accent:#2563eb; --accent-dim:#e8f0fe; --accent-strong:#1d4ed8;
+    --danger:#e11d48; --danger-dim:#fde8ec;
+    --green:#059669; --green-dim:#e3f7ef;
+    --shadow:0 1px 2px rgba(20,30,50,.04), 0 4px 14px rgba(20,30,50,.05);
+    --radius:16px;
+  }
+  :root:not([data-theme="light"]) { }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#11151c; --card:#181d26; --border:#262c38; --border-strong:#333b49;
+      --text:#e7ebf2; --text-dim:#a2acbd; --text-faint:#6b7686;
+      --accent:#5b8def; --accent-dim:#1c2a44; --accent-strong:#82aefb;
+      --danger:#f4577c; --danger-dim:#3a1620;
+      --green:#3ddba0; --green-dim:#123328;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#11151c; --card:#181d26; --border:#262c38; --border-strong:#333b49;
+    --text:#e7ebf2; --text-dim:#a2acbd; --text-faint:#6b7686;
+    --accent:#5b8def; --accent-dim:#1c2a44; --accent-strong:#82aefb;
+    --danger:#f4577c; --danger-dim:#3a1620;
+    --green:#3ddba0; --green-dim:#123328;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    padding:28px 20px 80px;
+  }
+  .wrap{max-width:1320px; margin:0 auto;}
+  .eyebrow{
+    text-align:center; letter-spacing:.22em; font-size:11px; font-weight:700;
+    color:var(--text-faint); margin-bottom:10px; text-transform:uppercase;
+  }
+  .eyebrow::before, .eyebrow::after{content:"—— "; }
+  .titlebar{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+  .titlebar h1{font-size:30px; margin:0 0 6px; font-weight:900; text-align:center; width:100%;}
+  .titlebar p.sub{margin:0; color:var(--text-dim); font-size:14px; text-align:center; width:100%;}
+  .actions-top{ display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap;}
+  .btn{
+    appearance:none; border:1px solid var(--border-strong); background:var(--card); color:var(--text);
+    padding:9px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; transition:.15s; white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--accent); color:var(--accent);}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .btn.primary:hover{background:var(--accent-strong); color:#fff;}
+  .btn.danger{color:var(--danger); border-color:var(--danger-dim);}
+  .btn.danger:hover{border-color:var(--danger);}
+  .btn.dark{background:#1a1f28; color:#fff; border-color:#1a1f28;}
+  .btn.small{padding:5px 10px; font-size:12px; border-radius:8px;}
+
+  .card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow);}
+  .banner{
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding:16px 20px; margin:22px 0;
+  }
+  .banner .left{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .banner .badge{
+    background:var(--green-dim); color:var(--green); font-weight:700; font-size:12px;
+    padding:4px 10px; border-radius:999px; border:1px solid var(--green); border-color:color-mix(in srgb, var(--green) 40%, transparent);
+  }
+  .banner .note{font-size:13px; color:var(--text-dim);}
+  .banner .stats{display:flex; gap:22px; font-size:13px; color:var(--text-dim); align-items:center;}
+  .banner .stats b{color:var(--text); font-size:16px;}
+
+  .infobox{ padding:18px 22px; margin-bottom:22px; }
+  .infobox-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:4px;}
+  .infobox-head h2{font-size:16px; margin:0; display:flex; align-items:center; gap:8px;}
+  .infobox p{margin:6px 0 0; font-size:13px; color:var(--text-dim);}
+
+  .tabbar{ display:flex; gap:6px; padding:6px; border-radius:14px; background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow); overflow-x:auto; margin-bottom:16px;}
+  .tabbar button{
+    flex:1; min-width:150px; border:none; background:transparent; color:var(--text-dim); font-weight:700; font-size:13px;
+    padding:11px 10px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap;
+  }
+  .tabbar button.active{background:#1a1f28; color:#fff;}
+
+  .filterbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:14px 16px; margin-bottom:18px;
+  }
+  .group{display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:10px; border:1px solid var(--border);}
+  .group button{
+    border:none; background:transparent; padding:7px 12px; border-radius:7px; font-size:12.5px; font-weight:700; color:var(--text-dim); cursor:pointer;
+  }
+  .group button.active{background:#1a1f28; color:#fff;}
+  .filterbar select, .filterbar input[type=text]{
+    border:1px solid var(--border-strong); background:var(--card); color:var(--text); border-radius:9px; padding:8px 10px; font-size:13px; font-family:inherit; font-weight:600;
+  }
+  #yearFilter, #monthFilter{ min-width:104px; }
+  .filterbar input[type=text]{min-width:220px; flex:1;}
+  .filterbar .spacer{flex:1;}
+  .result-chip{font-size:12.5px; color:var(--text-dim); white-space:nowrap;}
+  .result-chip b{color:var(--text);}
+
+  /* ---- Table view ---- */
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  thead th{
+    text-align:left; padding:10px 12px; background:var(--bg); color:var(--text-dim); font-size:12px;
+    border-bottom:1px solid var(--border-strong); position:sticky; top:0; white-space:nowrap;
+  }
+  tbody td{padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  tbody tr:hover{background:color-mix(in srgb, var(--accent) 5%, transparent);}
+  .daycell{font-weight:700;}
+  .daycell .wd{font-weight:500; color:var(--text-dim); font-size:12px; margin-left:4px;}
+  .sess{ display:inline-block; padding:3px 9px; border-radius:7px; font-size:11.5px; font-weight:700;}
+  .sess.am{background:var(--accent-dim); color:var(--accent);}
+  .sess.pm{background:#fff2df; color:#b45309;}
+  :root[data-theme="dark"] .sess.pm, @media (prefers-color-scheme: dark){ .sess.pm{background:#3a2a12; color:#f2b25c;} }
+  .roomtag{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap;}
+  .roomdot{width:8px; height:8px; border-radius:50%; flex:none;}
+  .org{font-weight:600;}
+  .count{font-weight:800; white-space:nowrap;}
+  .count::before{content:"👥 "; font-size:11px;}
+  .note{color:var(--text-dim); font-size:12.5px;}
+  .rowops{display:flex; gap:6px;}
+  .empty-row td{text-align:center; padding:40px; color:var(--text-faint);}
+
+  /* ---- calendar ---- */
+  .cal-head{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px;}
+  .cal-head h3{margin:0; font-size:20px; font-weight:900;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
+  .cal-dow{text-align:center; font-size:12px; font-weight:700; color:var(--text-dim); padding-bottom:4px;}
+  .cal-dow.sun{color:var(--danger);} .cal-dow.sat{color:var(--accent);}
+  .cal-day{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; min-height:118px;
+    display:flex; flex-direction:column; gap:5px; cursor:pointer; transition:.12s;
+  }
+  .cal-day:hover{border-color:var(--accent); box-shadow:var(--shadow);}
+  .cal-day.empty{background:transparent; border:none; cursor:default;}
+  .cal-day .dnum{display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13px;}
+  .cal-day .dnum.sun{color:var(--danger);} .cal-day .dnum.sat{color:var(--accent);}
+  .cal-count{ font-size:10.5px; font-weight:800; background:#1a1f28; color:#fff; border-radius:999px; padding:1px 7px;}
+  .cal-item{ font-size:10.5px; padding:2px 6px; border-radius:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
+  .cal-more{ font-size:10px; color:var(--text-faint); text-align:center; margin-top:2px;}
+  .cal-empty-label{font-size:11px; color:var(--text-faint); text-align:center; margin-top:auto; margin-bottom:auto;}
+
+  /* ---- rooms view ---- */
+  .room-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; margin-bottom:26px;}
+  .room-card{padding:16px; cursor:pointer; transition:.12s; border:1px solid var(--border);}
+  .room-card:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .room-card.selected{outline:2px solid var(--accent); outline-offset:-1px;}
+  .room-card .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .room-card .name{font-weight:800; font-size:15px; margin:4px 0 2px;}
+  .room-card .desc{font-size:11.5px; color:var(--text-dim); min-height:30px;}
+  .room-card .num{font-size:24px; font-weight:900; margin-top:8px;}
+  .room-card .num span{font-size:12px; font-weight:600; color:var(--text-dim);}
+
+  /* ---- print view ---- */
+  .print-area{padding:26px;}
+  .print-area h2{text-align:center; font-size:24px; margin:6px 0 2px;}
+  .print-area .p-sub{text-align:center; color:var(--text-dim); font-size:13px; margin-bottom:18px;}
+  .print-cols{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .p-month{margin-bottom:16px;}
+  .p-month h4{font-size:14px; border-bottom:2px solid #1a1f28; padding-bottom:6px; margin-bottom:8px;}
+  .p-date{font-weight:800; font-size:13px; margin-top:10px; display:flex; justify-content:space-between;}
+  .p-line{font-size:12px; color:var(--text-dim); padding-left:10px; display:flex; justify-content:space-between; gap:8px;}
+  .p-line b{color:var(--text); font-weight:700;}
+
+  /* ---- modal ---- */
+  .overlay{ position:fixed; inset:0; background:rgba(10,14,20,.5); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .overlay.show{display:flex;}
+  .modal{ background:var(--card); border-radius:16px; width:100%; max-width:460px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.3); max-height:90vh; overflow:auto;}
+  .modal h3{margin:0 0 16px; font-size:17px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:5px;}
+  .field input, .field select, .field textarea{
+    width:100%; border:1px solid var(--border-strong); background:var(--bg); color:var(--text); border-radius:9px;
+    padding:9px 11px; font-size:13.5px; font-family:inherit;
+  }
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .modal-ops{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
+
+  .daymodal-list{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .daymodal-item{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:12.5px;}
+  .daymodal-item .grow{flex:1;}
+  .daymodal-item .grow b{display:block; font-size:13px;}
+
+  footer{ text-align:center; margin-top:30px; color:var(--text-faint); font-size:12px; padding-top:18px; border-top:1px solid var(--border);}
+
+  @media print{
+    body *{visibility:hidden;}
+    #printSheet, #printSheet *{visibility:visible;}
+    #printSheet{position:absolute; left:0; top:0; width:100%;}
+    .no-print{display:none !important;}
+  }
+  @media (max-width: 720px){
+    .print-cols{grid-template-columns:1fr;}
+    table{font-size:12px;}
+    .titlebar h1{font-size:22px;}
+
+    /* 정규 일정표를 카드형으로 전환 (가로 스크롤 대신 세로 카드) */
+    #view-table table thead{ display:none; }
+    #view-table table, #view-table tbody, #view-table tr{ display:block; width:100%; }
+    #view-table tbody tr{
+      border:1px solid var(--border); border-radius:14px; margin:0 0 10px; padding:10px 12px;
+      background:var(--card); box-shadow:var(--shadow);
+    }
+    #view-table tbody td{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      border:none; padding:6px 2px;
+    }
+    #view-table tbody td[data-label]:not([data-label=""])::before{
+      content:attr(data-label); font-size:11px; font-weight:700; color:var(--text-faint); flex:none;
+    }
+    #view-table tbody td[data-label="일자"]{ font-size:14px; border-bottom:1px dashed var(--border); padding-bottom:8px; margin-bottom:2px; }
+    #view-table tbody td .rowops{ width:100%; justify-content:flex-end; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">GANGNEUNG BRANCH REGULAR PROGRAM SCHEDULE</div>
+  <div class="titlebar">
+    <h1>강릉분원 정규 프로그램 일정표</h1>
+    <p class="sub">정규 체험실습 및 장애이해·직업체험 프로그램 종합 일정 안내 (편집 가능 · 업무용)</p>
+    <div class="actions-top no-print">
+      <button class="btn primary" id="btnAdd">＋ 일정 추가</button>
+      <button class="btn" id="btnPrintTop">🖨 인쇄 / PDF</button>
+      <button class="btn" id="btnExportCsv">📥 CSV 다운로드</button>
+      <button class="btn" id="btnImportCsv">📤 CSV 업로드</button>
+      <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;">
+      <button class="btn" id="btnMyRooms">⭐ 내 담당 실</button>
+      <button class="btn danger" id="btnReset">초기 데이터로 재설정</button>
+    </div>
+  </div>
+
+  <div class="card banner no-print">
+    <div class="left">
+      <span class="badge" id="collabBadge">⏳ 공유 저장소 확인 중...</span>
+      <span class="note">일정·구분(학교급)·인원수를 표에서 바로 수정하거나 상단 <b>＋ 일정 추가</b> 버튼으로 새 일정을 등록할 수 있습니다.</span>
+    </div>
+    <div class="stats">
+      <span>총 참석 인원: <b id="statTotalCount">-</b>명</span>
+      <span>총 진행 세션: <b id="statTotalSessions">-</b>회</span>
+    </div>
+  </div>
+
+  <div class="card no-print" id="todayStrip" style="display:flex; gap:10px; flex-wrap:wrap; padding:12px 16px; margin-bottom:18px;">
+    <button class="btn small" id="todayCard" style="background:var(--accent-dim); border-color:transparent; color:var(--accent); font-weight:800;"></button>
+    <span class="btn small" id="weekCard" style="background:var(--bg); cursor:default; font-weight:800;"></span>
+  </div>
+
+  <div class="tabbar no-print">
+    <button data-tab="table" class="active">📋 정규 일정표 (테이블)</button>
+    <button data-tab="calendar">📅 월간 캘린더</button>
+    <button data-tab="rooms">🏛 프로그램실별 현황</button>
+    <button data-tab="years">🗓 연도별 정리</button>
+    <button data-tab="print">🖨 인쇄용 서식 (A4)</button>
+  </div>
+
+  <div class="card filterbar no-print" id="filterbar">
+    <select id="yearFilter"></select>
+    <select id="monthFilter"></select>
+    <select id="roomFilter"><option value="all">모든 실 (전체)</option></select>
+    <div class="group" id="sessGroup">
+      <button data-v="all" class="active">전체</button>
+      <button data-v="AM">오전</button>
+      <button data-v="PM">오후</button>
+    </div>
+    <button class="btn small" id="btnMyRoomsToggle" title="설정한 담당 실만 필터링">⭐ 내 담당만</button>
+    <input type="text" id="searchBox" placeholder="🔍 구분 · 비고 검색...">
+    <div class="spacer"></div>
+    <span class="result-chip" id="resultChip"></span>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div class="card" id="view-table">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px;">일자</th>
+          <th style="width:60px;">시간</th>
+          <th style="width:220px;">프로그램실</th>
+          <th>구분 / 비고</th>
+          <th style="width:90px;">인원</th>
+          <th style="width:110px;" class="no-print">관리</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="card" id="view-calendar" style="display:none; padding:22px;">
+    <div class="cal-head">
+      <button class="btn small" id="calPrev">‹</button>
+      <h3 id="calTitle">2026년 9월</h3>
+      <button class="btn small" id="calNext">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- ROOMS VIEW -->
+  <div id="view-rooms" style="display:none;">
+    <div class="room-grid" id="roomGrid"></div>
+    <div class="card" id="roomDetailCard" style="display:none; padding:0;">
+      <table>
+        <thead><tr><th style="width:110px;">일자</th><th style="width:60px;">시간</th><th>구분 / 비고</th><th style="width:90px;">인원</th></tr></thead>
+        <tbody id="roomDetailBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- YEARS VIEW -->
+  <div id="view-years" style="display:none;">
+    <div class="card" id="yearCompareCard" style="display:none; padding:18px 20px; margin-bottom:16px;">
+      <h3 style="margin:0 0 10px; font-size:15px;">📊 연도별 비교 (월별 참석 인원)</h3>
+      <div id="yearCompareChart"></div>
+      <div id="yearCompareLegend" style="margin-top:8px;"></div>
+    </div>
+    <div class="room-grid" id="yearGrid"></div>
+    <div class="card" id="yearMatrixCard" style="display:none; padding:18px 20px; margin-bottom:16px; overflow-x:auto;">
+      <h3 style="margin:0 0 4px; font-size:15px;" id="yearMatrixTitle">학교급별 · 월별 참석 인원</h3>
+      <p style="margin:0 0 12px; font-size:12px; color:var(--text-dim);">칸 색이 진할수록 해당 월에 인원이 많다는 뜻입니다.</p>
+      <table id="yearMatrixTable" style="min-width:640px;"></table>
+    </div>
+    <div class="card" id="yearDetailCard" style="display:none; padding:0;">
+      <table>
+        <thead><tr><th style="width:110px;">일자</th><th style="width:60px;">시간</th><th style="width:200px;">프로그램실</th><th>구분 / 비고</th><th style="width:90px;">인원</th></tr></thead>
+        <tbody id="yearDetailBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PRINT VIEW -->
+  <div class="card" id="view-print" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px 0; flex-wrap:wrap; gap:10px;" class="no-print">
+      <div class="group" id="printModeGroup">
+        <button data-v="detail" class="active">상세 일정표</button>
+        <button data-v="summary">요약 통계표</button>
+      </div>
+      <button class="btn dark" id="btnPrintNow">🖨 지금 인쇄하기 (PDF 저장)</button>
+    </div>
+    <div class="print-area" id="printSheet">
+      <div style="text-align:right; font-size:11px; color:var(--text-dim);">운영기간: <span id="pRange"></span></div>
+      <h2 id="pTitle">강릉분원 정규 프로그램 일정표</h2>
+      <p class="p-sub" id="pSub">2학기 특수 및 직업진로체험 정규과정 편성표 · 참석 인원수 기준</p>
+      <div class="print-cols" id="printCols"></div>
+    </div>
+  </div>
+
+  <footer>강릉분원 정규 프로그램 운영위원회 · 이 화면에서 직접 수정한 내용은 브라우저에 저장됩니다</footer>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <h3 id="editTitle">일정 추가</h3>
+    <input type="hidden" id="editId">
+    <div class="field" id="templateRow" style="display:none;">
+      <label>⭐ 자주 쓰는 일정 (클릭하면 아래 항목이 채워집니다)</label>
+      <div id="templateChips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+    </div>
+    <div class="field">
+      <label>날짜</label>
+      <input type="date" id="f_date">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>시간</label>
+        <select id="f_session"><option value="AM">오전</option><option value="PM">오후</option></select>
+      </div>
+      <div class="field">
+        <label>인원수</label>
+        <input type="number" id="f_count" min="0" value="1">
+      </div>
+    </div>
+    <div class="field">
+      <label>프로그램실</label>
+      <div style="display:flex; gap:6px;">
+        <select id="f_room" style="flex:1;"></select>
+        <button type="button" class="btn small" id="btnAddRoom" title="새 프로그램 추가">＋ 새 프로그램</button>
+        <button type="button" class="btn small danger" id="btnDeleteRoom" title="이 프로그램 삭제" style="display:none;">삭제</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>구분 (개인정보 보호를 위해 학교급/기관만 선택)</label>
+      <select id="f_org">
+        <option value="유치원">유치원</option>
+        <option value="초등학교">초등학교</option>
+        <option value="중학교">중학교</option>
+        <option value="고등학교">고등학교</option>
+        <option value="특수학교">특수학교</option>
+        <option value="기관">기관</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>비고 (선택)</label>
+      <input type="text" id="f_note" placeholder="예) 날짜 변경, 취소 등">
+    </div>
+    <div class="modal-ops" style="justify-content:space-between;">
+      <button class="btn small" id="btnSaveTemplate" title="지금 입력한 실/구분/인원/비고를 템플릿으로 저장">💾 템플릿으로 저장</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" id="btnCancelEdit">취소</button>
+        <button class="btn primary" id="btnSaveEdit">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="overlay" id="dayOverlay">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="dayTitle">일정</h3>
+    <div class="field" style="margin-bottom:14px;">
+      <label>📌 이 날짜 공지사항 (예: 업사이클링실 휴관, 시설 점검 등)</label>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="dayNoteInput" placeholder="공지사항이 없으면 비워두세요" style="flex:1;">
+        <button class="btn small primary" id="btnSaveDayNote">저장</button>
+      </div>
+    </div>
+    <div class="daymodal-list" id="dayList"></div>
+    <div class="modal-ops">
+      <button class="btn" id="btnCloseDay">닫기</button>
+      <button class="btn primary" id="btnAddInDay">＋ 이 날짜에 일정 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- MY ROOMS (내 담당 실) MODAL -->
+<div class="overlay" id="myRoomsOverlay">
+  <div class="modal">
+    <h3>⭐ 내 담당 실 설정</h3>
+    <p style="font-size:12.5px; color:var(--text-dim); margin:0 0 12px;">체크한 프로그램실만 필터에서 "⭐ 내 담당만" 버튼으로 빠르게 모아볼 수 있어요. (이 설정은 내 브라우저에만 저장되며 다른 직원과 공유되지 않습니다)</p>
+    <div id="myRoomsList" style="display:flex; flex-direction:column; gap:8px; max-height:340px; overflow:auto;"></div>
+    <div class="modal-ops">
+      <button class="btn" id="btnCloseMyRooms">닫기</button>
+      <button class="btn primary" id="btnSaveMyRooms">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERIC CONFIRM / PROMPT / ALERT MODAL (브라우저 기본 confirm/alert/prompt 대체) -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal" style="max-width:400px;">
+    <h3 id="confirmTitle">확인</h3>
+    <p id="confirmMessage" style="font-size:13.5px; color:var(--text-dim); white-space:pre-line; margin:0 0 14px; line-height:1.6;"></p>
+    <div class="field" id="confirmInputWrap" style="display:none;">
+      <input type="text" id="confirmInput">
+    </div>
+    <div class="modal-ops">
+      <button class="btn" id="confirmCancelBtn">취소</button>
+      <button class="btn primary" id="confirmOkBtn">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= CUSTOM DIALOGS (native alert/confirm/prompt는 퍼블리시된 페이지에서 차단되어 사용 불가) ================= */
+let confirmState = { resolve:null, isPrompt:false };
+function openConfirmModal({title='확인', message='', isPrompt=false, defaultValue='', okText='확인', danger=false, hideCancel=false}){
+  return new Promise(resolve=>{
+    confirmState = { resolve, isPrompt };
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmInputWrap').style.display = isPrompt ? 'block' : 'none';
+    document.getElementById('confirmInput').value = defaultValue;
+    document.getElementById('confirmCancelBtn').style.display = hideCancel ? 'none' : 'inline-flex';
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = okText;
+    okBtn.className = 'btn ' + (danger ? 'danger' : 'primary');
+    document.getElementById('confirmOverlay').classList.add('show');
+    if(isPrompt) setTimeout(()=>document.getElementById('confirmInput').focus(), 60);
+  });
+}
+function closeConfirmModal(confirmed){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  const { resolve, isPrompt } = confirmState;
+  confirmState = { resolve:null, isPrompt:false };
+  if(!resolve) return;
+  if(isPrompt){ resolve(confirmed ? document.getElementById('confirmInput').value : null); }
+  else{ resolve(!!confirmed); }
+}
+document.getElementById('confirmCancelBtn').onclick = ()=>closeConfirmModal(false);
+document.getElementById('confirmOkBtn').onclick = ()=>closeConfirmModal(true);
+document.getElementById('confirmInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); closeConfirmModal(true); } });
+async function askConfirm(message, opts={}){
+  return await openConfirmModal({message, isPrompt:false, danger:opts.danger, okText:opts.okText||'확인', title:opts.title||'확인'});
+}
+async function askPrompt(message, defaultValue=''){
+  return await openConfirmModal({message, isPrompt:true, defaultValue, okText:'추가', title:'입력'});
+}
+async function askAlert(message, opts={}){
+  await openConfirmModal({message, isPrompt:false, hideCancel:true, okText:'확인', title:opts.title||'알림', danger:opts.danger});
+}
+
+/* ================= ROOM DEFINITIONS ================= */
+const BASE_ROOMS = [
+  {id:'safety',   name:'안전체험관',                          color:'#d97706', desc:'지진·화재·교통 안전 및 비상탈출 대응 훈련'},
+  {id:'cook',     name:'진로·직업교육실(요리)',                color:'#1f2937', desc:'제과제빵 및 일상 식생활 직무 기능 훈련'},
+  {id:'mask',     name:'공연장(관노가면극)',                   color:'#8b5cf6', desc:'강릉 전통 관노가면극 관람 및 전통연희 체험'},
+  {id:'upcycle',  name:'해안 업사이클링실',                    color:'#059669', desc:'해안 유목·유리 공예 및 친환경 자원순환 메이커'},
+  {id:'barista',  name:'바리스타 체험실',                      color:'#ca8a04', desc:'에스프레소 추출, 핸드드립 및 음료 제조 직무'},
+  {id:'drawing',  name:'중회의실(디지털드로잉)',                color:'#2563eb', desc:'태블릿 웹툰·일러스트 드로잉 및 그래픽 창작'},
+  {id:'craft',    name:'장애이해교육실(공예)',                  color:'#db2777', desc:'공예 도구를 활용한 촉각 창작 및 장애인식 개선'},
+  {id:'club',     name:'장애이해교육 동아리실(실용음악·영상)',   color:'#4f46e5', desc:'악기 연주, 밴드 앙상블 및 영상 미디어 제작'},
+  {id:'digital',  name:'디지털융합교실',                       color:'#0891b2', desc:'디지털 융합 체험 및 코딩·미디어 교육'},
+  {id:'esports',  name:'e스포츠 체험실',                       color:'#475569', desc:'e스포츠 체험 및 게임 리터러시 교육'},
+  {id:'visit',    name:'특별연수 및 기관방문',                  color:'#0284c7', desc:'교원 맞춤형 연수, 교육지원청 및 대외 협력 기관 방문'},
+];
+const CUSTOM_ROOMS_KEY = 'gnBranchCustomRoomsV1';
+const CUSTOM_COLOR_PALETTE = ['#0d9488','#c026d3','#ea580c','#65a30d','#7c3aed','#0369a1','#be123c','#a16207','#16a34a','#9333ea'];
+let customRooms = [];
+try{ customRooms = JSON.parse(localStorage.getItem(CUSTOM_ROOMS_KEY) || '[]'); }catch(e){ customRooms = []; }
+let ROOMS = [];
+let roomMap = {};
+function rebuildRooms(){
+  ROOMS = [...BASE_ROOMS, ...customRooms];
+  roomMap = Object.fromEntries(ROOMS.map(r=>[r.id,r]));
+}
+function persistCustomRooms(){ try{ localStorage.setItem(CUSTOM_ROOMS_KEY, JSON.stringify(customRooms)); }catch(e){} }
+function slugify(name){
+  return 'p_' + name.trim().toLowerCase().replace(/[^a-z0-9가-힣]+/g,'').slice(0,20) + Math.random().toString(16).slice(2,6);
+}
+function addCustomRoom(name){
+  name = (name||'').trim();
+  if(!name) return null;
+  const dup = ROOMS.find(r=>r.name===name);
+  if(dup) return dup.id;
+  const color = CUSTOM_COLOR_PALETTE[customRooms.length % CUSTOM_COLOR_PALETTE.length];
+  const room = { id: slugify(name), name, color, desc:'사용자가 추가한 프로그램', custom:true };
+  customRooms.push(room);
+  persistCustomRooms();
+  rebuildRooms();
+  dbSetRoom(room);
+  return room.id;
+}
+async function removeCustomRoom(id){
+  const inUse = entries.some(e=>e.room===id);
+  if(inUse){ await askAlert('이 프로그램을 사용 중인 일정이 있어 삭제할 수 없습니다. 먼저 해당 일정을 다른 프로그램으로 변경하거나 삭제해주세요.'); return; }
+  customRooms = customRooms.filter(r=>r.id!==id);
+  persistCustomRooms();
+  rebuildRooms();
+  dbDeleteRoom(id);
+  renderRoomOptions(); fillRoomSelect(); renderAll();
+}
+rebuildRooms();
+
+/* ================= TEMPLATES (자주 쓰는 일정) ================= */
+const TEMPLATES_KEY = 'gnBranchTemplatesV1';
+let templates = [];
+try{ templates = JSON.parse(localStorage.getItem(TEMPLATES_KEY) || '[]'); }catch(e){ templates = []; }
+function persistTemplates(){ try{ localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates)); }catch(e){} }
+function templateLabel(t){ const r = roomMap[t.room]; return `${t.org} ${t.count}명 · ${r?r.name:t.room}`; }
+function renderTemplateChips(){
+  const row = document.getElementById('templateRow');
+  const box = document.getElementById('templateChips');
+  if(!templates.length){ row.style.display='none'; return; }
+  row.style.display='block';
+  box.innerHTML = templates.map(t=>`
+    <span class="roomtag" style="background:var(--accent-dim); color:var(--accent); cursor:pointer; padding-right:6px;" onclick="applyTemplate('${t.id}')">
+      ${escapeHtml(templateLabel(t))}
+      <span onclick="event.stopPropagation(); deleteTemplate('${t.id}')" title="템플릿 삭제" style="margin-left:4px; font-weight:900; opacity:.6;">×</span>
+    </span>`).join('');
+}
+function applyTemplate(id){
+  const t = templates.find(x=>x.id===id); if(!t) return;
+  document.getElementById('f_room').value = t.room;
+  document.getElementById('f_org').value = t.org;
+  document.getElementById('f_count').value = t.count;
+  document.getElementById('f_note').value = t.note || '';
+  updateRoomDeleteBtn();
+}
+async function deleteTemplate(id){
+  const ok = await askConfirm('이 템플릿을 삭제할까요?', {danger:true, okText:'삭제'});
+  if(!ok) return;
+  templates = templates.filter(t=>t.id!==id);
+  persistTemplates();
+  dbDeleteTemplate(id);
+  renderTemplateChips();
+}
+function subscribeTemplatesDb(){
+  dbApi.collection('templates').onSnapshot(snap=>{
+    templates = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    persistTemplates();
+    renderTemplateChips();
+  }, err=>{ console.warn('templates snapshot error', err); });
+}
+
+/* ================= DAY NOTES (날짜별 공지사항) ================= */
+const DAY_NOTES_KEY = 'gnBranchDayNotesV1';
+let dayNotes = {};
+try{ dayNotes = JSON.parse(localStorage.getItem(DAY_NOTES_KEY) || '{}'); }catch(e){ dayNotes = {}; }
+function persistDayNotes(){ try{ localStorage.setItem(DAY_NOTES_KEY, JSON.stringify(dayNotes)); }catch(e){} }
+function subscribeDayNotesDb(){
+  dbApi.collection('dayNotes').onSnapshot(snap=>{
+    const next = {};
+    snap.docs.forEach(d=>{ const data=d.data(); if(data && data.text) next[d.id] = data.text; });
+    dayNotes = next;
+    persistDayNotes();
+    if(state.tab==='calendar') renderCalendar();
+  }, err=>{ console.warn('dayNotes snapshot error', err); });
+}
+function dbSetDayNote(date, text){
+  if(!dbAvailable) return;
+  dbApi.collection('dayNotes').doc(date).set({text}).catch(e=>console.warn('dayNote write failed', e));
+}
+function dbDeleteDayNote(date){
+  if(!dbAvailable) return;
+  dbApi.collection('dayNotes').doc(date).delete().catch(e=>console.warn('dayNote delete failed', e));
+}
+function dbSetTemplate(t){
+  if(!dbAvailable) return;
+  const {id, ...data} = t;
+  dbApi.collection('templates').doc(id).set(data).catch(e=>console.warn('template write failed', e));
+}
+function dbDeleteTemplate(id){
+  if(!dbAvailable) return;
+  dbApi.collection('templates').doc(id).delete().catch(e=>console.warn('template delete failed', e));
+}
+document.getElementById('btnSaveTemplate').onclick = async ()=>{
+  const room = document.getElementById('f_room').value;
+  const org = document.getElementById('f_org').value;
+  const count = Number(document.getElementById('f_count').value)||0;
+  const note = document.getElementById('f_note').value.trim();
+  if(templates.length >= 12){ await askAlert('템플릿은 최대 12개까지 저장할 수 있습니다. 기존 템플릿을 정리해주세요.'); return; }
+  const t = { id:'tpl'+Date.now()+Math.random().toString(16).slice(2), room, org, count, note };
+  templates.push(t);
+  persistTemplates();
+  dbSetTemplate(t);
+  renderTemplateChips();
+  await askAlert(`템플릿으로 저장했어요: ${templateLabel(t)}`);
+};
+
+/* ================= MY ROOMS (내 담당 실, 브라우저 개인 설정) ================= */
+const MY_ROOMS_KEY = 'gnMyRoomsV1';
+let myRooms = [];
+try{ myRooms = JSON.parse(localStorage.getItem(MY_ROOMS_KEY) || '[]'); }catch(e){ myRooms = []; }
+function persistMyRooms(){ try{ localStorage.setItem(MY_ROOMS_KEY, JSON.stringify(myRooms)); }catch(e){} }
+function renderMyRoomsList(){
+  const box = document.getElementById('myRoomsList');
+  box.innerHTML = ROOMS.map(r=>`
+    <label style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; cursor:pointer;">
+      <input type="checkbox" value="${r.id}" ${myRooms.includes(r.id)?'checked':''} style="width:16px; height:16px;">
+      <span class="roomdot" style="background:${r.color};"></span>
+      <span style="font-size:13px; font-weight:600;">${r.name}</span>
+    </label>`).join('');
+}
+document.getElementById('btnMyRooms').onclick = ()=>{
+  renderMyRoomsList();
+  document.getElementById('myRoomsOverlay').classList.add('show');
+};
+document.getElementById('btnCloseMyRooms').onclick = ()=>document.getElementById('myRoomsOverlay').classList.remove('show');
+document.getElementById('btnSaveMyRooms').onclick = ()=>{
+  const checked = [...document.querySelectorAll('#myRoomsList input[type=checkbox]:checked')].map(cb=>cb.value);
+  myRooms = checked;
+  persistMyRooms();
+  document.getElementById('myRoomsOverlay').classList.remove('show');
+  updateMyRoomsToggleBtn();
+  renderAll();
+};
+function updateMyRoomsToggleBtn(){
+  const btn = document.getElementById('btnMyRoomsToggle');
+  if(myRooms.length===0){ btn.style.opacity='.5'; btn.title='먼저 상단 "⭐ 내 담당 실"에서 담당 실을 선택해주세요'; }
+  else{ btn.style.opacity='1'; btn.title='설정한 담당 실만 필터링'; }
+  btn.classList.toggle('primary', state.myRoomsOnly);
+}
+document.getElementById('btnMyRoomsToggle').onclick = async ()=>{
+  if(myRooms.length===0){ await askAlert('먼저 상단의 "⭐ 내 담당 실" 버튼에서 담당 프로그램실을 선택해주세요.'); return; }
+  state.myRoomsOnly = !state.myRoomsOnly;
+  updateMyRoomsToggleBtn();
+  renderAll();
+};
+
+/* ================= REALTIME COLLABORATION (org-shared db) ================= */
+let dbApi = null;
+let roomApi = null;
+let dbAvailable = false;
+let entriesSeeded = false;
+
+function setCollabBadge(mode, peerCount){
+  const el = document.getElementById('collabBadge');
+  if(!el) return;
+  if(mode==='shared'){
+    el.textContent = `🟢 조직과 실시간 공유 중${(peerCount!=null)? ' · 현재 '+peerCount+'명 접속':''}`;
+    el.style.background = 'var(--green-dim)'; el.style.color = 'var(--green)';
+  }else if(mode==='connecting'){
+    el.textContent = '⏳ 공유 저장소 확인 중...';
+    el.style.background = 'var(--accent-dim)'; el.style.color = 'var(--accent)';
+  }else{
+    el.textContent = '⚪ 이 브라우저에만 저장됨 (공유 안 됨)';
+    el.style.background = 'var(--accent-dim)'; el.style.color = 'var(--text-dim)';
+  }
+}
+
+async function chunkedSet(pairs){ // [{ref, data}]
+  const CHUNK = 15;
+  for(let i=0;i<pairs.length;i+=CHUNK){
+    const slice = pairs.slice(i, i+CHUNK);
+    await Promise.all(slice.map(p=>p.ref.set(p.data).catch(e=>console.warn('write failed', e))));
+  }
+}
+
+async function seedEntriesToDb(){
+  const base = entries.length ? entries : buildSeed();
+  const pairs = base.map(s=>({
+    ref: dbApi.collection('entries').doc(s.id),
+    data: { date:s.date, session:s.session, room:s.room, org:s.org, count:Number(s.count)||0, note:s.note||'' }
+  }));
+  await chunkedSet(pairs);
+}
+
+function subscribeEntriesDb(){
+  dbApi.collection('entries').onSnapshot(snap=>{
+    if(snap.empty){
+      if(!entriesSeeded){ entriesSeeded = true; seedEntriesToDb(); }
+      return;
+    }
+    entries = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderAll();
+  }, err=>{ console.warn('entries snapshot error', err); });
+}
+
+function subscribeRoomsDb(){
+  dbApi.collection('customRooms').onSnapshot(snap=>{
+    customRooms = snap.docs.map(d=>({ id:d.id, custom:true, ...d.data() }));
+    rebuildRooms();
+    renderRoomOptions();
+    fillRoomSelect();
+    renderAll();
+  }, err=>{ console.warn('rooms snapshot error', err); });
+}
+
+function dbSetEntry(entry){
+  if(!dbAvailable) return;
+  const {id, ...data} = entry;
+  dbApi.collection('entries').doc(id).set(data).catch(e=>console.warn('entry write failed', e));
+}
+function dbDeleteEntry(id){
+  if(!dbAvailable) return;
+  dbApi.collection('entries').doc(id).delete().catch(e=>console.warn('entry delete failed', e));
+}
+function dbSetRoom(room){
+  if(!dbAvailable) return;
+  dbApi.collection('customRooms').doc(room.id).set({name:room.name, color:room.color, desc:room.desc}).catch(e=>console.warn('room write failed', e));
+}
+function dbDeleteRoom(id){
+  if(!dbAvailable) return;
+  dbApi.collection('customRooms').doc(id).delete().catch(e=>console.warn('room delete failed', e));
+}
+
+function initPresence(){
+  if(!roomApi){ setCollabBadge('shared'); return; }
+  try{
+    roomApi.presence({ joinedAt: Date.now() }).catch(()=>{});
+    roomApi.onPeers(change=>{ setCollabBadge('shared', (change && change.peers && change.peers.length) || 1); });
+  }catch(e){ setCollabBadge('shared'); }
+}
+
+async function initCollab(){
+  setCollabBadge('connecting');
+  try{
+    if(window.claude && typeof window.claude.use === 'function'){
+      downloadsApi = await window.claude.use('downloads');
+    }
+  }catch(e){ downloadsApi = null; }
+  try{
+    if(window.claude && typeof window.claude.use === 'function'){
+      dbApi = await window.claude.use('db');
+    }
+  }catch(e){ dbApi = null; }
+  if(!dbApi){ setCollabBadge('local'); dbAvailable = false; return; }
+  dbAvailable = true;
+  subscribeEntriesDb();
+  subscribeRoomsDb();
+  subscribeTemplatesDb();
+  subscribeDayNotesDb();
+  try{
+    if(window.claude && typeof window.claude.use === 'function'){
+      roomApi = await window.claude.use('room');
+    }
+  }catch(e){ roomApi = null; }
+  initPresence();
+}
+
+/* ================= CSV EXPORT ================= */
+let downloadsApi = null;
+function toCsvField(v){
+  const s = String(v==null?'':v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+function buildCsv(rows){
+  const header = ['일자','요일','시간','프로그램실','구분','인원','비고'];
+  const lines = [header.map(toCsvField).join(',')];
+  rows.forEach(e=>{
+    const r = roomMap[e.room] || {name:e.room};
+    lines.push([
+      e.date, wd(e.date), e.session==='AM'?'오전':'오후', r.name, e.org, e.count, e.note||''
+    ].map(toCsvField).join(','));
+  });
+  return '\uFEFF' + lines.join('\r\n'); // BOM 포함 → 엑셀에서 한글 깨짐 방지
+}
+async function exportCsv(){
+  const rows = filtered();
+  if(rows.length===0){ await askAlert('내보낼 일정이 없습니다. 필터를 확인해주세요.'); return; }
+  const csv = buildCsv(rows);
+  const today = new Date();
+  const fname = `강릉분원_일정_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}.csv`;
+  if(!downloadsApi){
+    await askAlert('이 화면에서는 파일 다운로드를 사용할 수 없습니다. claude.ai 아티팩트 화면에서 다시 시도해주세요.');
+    return;
+  }
+  try{
+    await downloadsApi.save({ filename: fname, data: csv });
+  }catch(e){
+    if(e && e.code==='declined') return;
+    await askAlert('다운로드에 실패했습니다: ' + (e && e.message ? e.message : '알 수 없는 오류'));
+  }
+}
+document.getElementById('btnExportCsv').onclick = exportCsv;
+
+/* ================= CSV IMPORT (일괄 업로드) — 구분자/헤더 순서/날짜 형식을 관대하게 인식 ================= */
+function detectDelimiter(sampleLine){
+  const counts = { ',': (sampleLine.match(/,/g)||[]).length, ';': (sampleLine.match(/;/g)||[]).length, '\t': (sampleLine.match(/\t/g)||[]).length };
+  let best = ','; let bestN = counts[','];
+  if(counts[';'] > bestN){ best=';'; bestN=counts[';']; }
+  if(counts['\t'] > bestN){ best='\t'; bestN=counts['\t']; }
+  return best;
+}
+function parseCsvRaw(text, delimiter){
+  if(text.charCodeAt(0)===0xFEFF) text = text.slice(1);
+  const rows = []; let i=0, field='', row=[], inQuotes=false;
+  while(i < text.length){
+    const c = text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i+=2; continue; } inQuotes=false; i++; continue; }
+      field+=c; i++; continue;
+    }else{
+      if(c==='"'){ inQuotes=true; i++; continue; }
+      if(c===delimiter){ row.push(field); field=''; i++; continue; }
+      if(c==='\r'){ i++; continue; }
+      if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; i++; continue; }
+      field+=c; i++; continue;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=> r.some(v=>(v||'').trim()!==''));
+}
+const HEADER_ALIASES = {
+  date:   ['일자','날짜','date','일시'],
+  session:['시간','오전오후','session','시간대'],
+  room:   ['프로그램실','실','장소','room','프로그램'],
+  org:    ['구분','학교급','기관구분','org','category'],
+  count:  ['인원','인원수','참석인원','count','명수'],
+  note:   ['비고','메모','note','비고사항']
+};
+function detectHeaderMap(headerRow){
+  const map = {};
+  headerRow.forEach((raw, idx)=>{
+    const cell = (raw||'').trim().toLowerCase().replace(/\s|\(|\)/g,'');
+    for(const key in HEADER_ALIASES){
+      if(map[key]!==undefined) continue;
+      if(HEADER_ALIASES[key].some(a=>cell===a.toLowerCase() || cell.includes(a.toLowerCase()))){ map[key]=idx; break; }
+    }
+  });
+  return map;
+}
+function normalizeDate(raw, fallbackYear){
+  if(!raw) return null;
+  const s = raw.trim();
+  if(!s) return null;
+  let m = s.match(/(\d{4})[.\-\/년]\s*(\d{1,2})[.\-\/월]\s*(\d{1,2})\s*일?/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  m = s.match(/^(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{4})$/); // MM-DD-YYYY / DD-MM-YYYY 형태 대비(월 우선 가정)
+  if(m) return `${m[3]}-${String(m[1]).padStart(2,'0')}-${String(m[2]).padStart(2,'0')}`;
+  // 연도 없는 한국어 표기: "9월 1일", "9월1일", 뒤에 요일(화, 수 등)이 붙어도 인식
+  m = s.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if(m) return `${fallbackYear}-${String(m[1]).padStart(2,'0')}-${String(m[2]).padStart(2,'0')}`;
+  // 연도 없는 "9/1", "9-1"
+  m = s.match(/^(\d{1,2})[.\-\/](\d{1,2})$/);
+  if(m) return `${fallbackYear}-${String(m[1]).padStart(2,'0')}-${String(m[2]).padStart(2,'0')}`;
+  return null;
+}
+function detectFallbackYear(raw, colIndices){
+  const counts = {};
+  raw.forEach(row=>{
+    const cells = colIndices ? colIndices.map(i=>row[i]) : row;
+    cells.forEach(cell=>{
+      const m = (cell||'').match(/20\d{2}/);
+      if(m) counts[m[0]] = (counts[m[0]]||0)+1;
+    });
+  });
+  let best = null, bestN = 0;
+  for(const y in counts){ if(counts[y]>bestN){ best=y; bestN=counts[y]; } }
+  return best || String(new Date().getFullYear());
+}
+function normalizeSession(raw){
+  const s = (raw||'').trim().toUpperCase();
+  if(!s) return null;
+  if(s.includes('오전') || s==='AM' || s==='A') return 'AM';
+  if(s.includes('오후') || s==='PM' || s==='P') return 'PM';
+  return null;
+}
+function normalizeOrg(raw){
+  const s = (raw||'').trim();
+  if(!s) return null;
+  let hit = CAT_ORDER.find(c=>s===c);
+  if(hit) return hit;
+  hit = CAT_ORDER.find(c=>s.includes(c));
+  if(hit) return hit;
+  if(s.includes('유치원')||s.includes('어린이집')) return '유치원';
+  if(s.includes('초등')) return '초등학교';
+  if(s.includes('중등')||s.includes('중학')) return '중학교';
+  if(s.includes('고등')) return '고등학교';
+  if(s.includes('특수')) return '특수학교';
+  return null;
+}
+// 실제 학교/기관 이름(예: "사천초(특수)", "경포고", "노암병설유치원")을 학교급 구분으로 자동 분류
+function classifySchoolName(name){
+  if(!name) return '기관';
+  if(name.includes('유치원')||name.includes('어린이집')) return '유치원';
+  if(name.includes('오성')) return '특수학교'; // 강릉오성학교(특수학교)
+  if(name.includes('특수학교')) return '특수학교';
+  const base = name.split(/[\(（]/)[0].trim();
+  if(/고등학교$|고$/.test(base)) return '고등학교';
+  if(/중학교$|중$/.test(base)) return '중학교';
+  if(/초등학교$|초$/.test(base)) return '초등학교';
+  return '기관';
+}
+// ===== 강릉분원 원본 "피벗형(가로형)" 시간표 CSV 전용 파서 =====
+// 열 구성: 0=날짜 1=요일 2=시간 3~13=11개 프로그램실 14=(빈칸) 15=방문일자 16=기관명(방문) 17=인원(방문)
+const PIVOT_ROOM_COLS = [
+  {idx:3, roomId:'safety'}, {idx:4, roomId:'cook'}, {idx:5, roomId:'mask'},
+  {idx:6, roomId:'upcycle'}, {idx:7, roomId:'barista'}, {idx:8, roomId:'drawing'},
+  {idx:9, roomId:'craft'}, {idx:10, roomId:null, label:'장애이해교육'},
+  {idx:11, roomId:'club'}, {idx:12, roomId:'digital'}, {idx:13, roomId:'esports'},
+];
+function looksLikePivotFormat(raw){
+  if(raw.length < 3) return false;
+  const h0 = (raw[0][0]||'').trim();
+  const h1 = (raw[0][1]||'').trim();
+  return h0==='날짜' && h1==='요일';
+}
+function parsePivotFormat(raw, fallbackYear){
+  const valid = [];
+  let lastDate = null;
+  for(let i=2; i<raw.length; i++){
+    const row = raw[i];
+    if(!row || row.length===0) continue;
+    const dateRaw = (row[0]||'').trim();
+    const parsedDate = normalizeDate(dateRaw, fallbackYear);
+    const date = parsedDate || lastDate;
+    if(parsedDate) lastDate = parsedDate;
+    const session = normalizeSession(row[2]);
+    if(date && session){
+      PIVOT_ROOM_COLS.forEach(col=>{
+        const cellText = row[col.idx];
+        if(!cellText || !cellText.trim()) return;
+        let roomId = col.roomId;
+        if(!roomId){
+          if(!col._resolvedId) col._resolvedId = addCustomRoom(col.label);
+          roomId = col._resolvedId;
+        }
+        cellText.split('\n').forEach(line=>{
+          const m = line.match(/(.+?)\s*(\d+)\s*명/);
+          if(!m) return;
+          const name = m[1].trim();
+          const count = Number(m[2]);
+          if(!name || !Number.isFinite(count)) return;
+          valid.push({ date, session, room:roomId, org:classifySchoolName(name), count, note:'' });
+        });
+      });
+    }
+    // 오른쪽 "특별연수 및 기관방문" 로그(열 15~17)는 본문 날짜와 무관하게 자체 날짜를 가짐
+    const visitDateRaw = (row[15]||'').trim();
+    const visitText = (row[16]||'').trim();
+    if(visitText){
+      const vDate = normalizeDate(visitDateRaw, fallbackYear);
+      let vCount = Number((row[17]||'').toString().replace(/[^0-9.\-]/g,''));
+      if(!Number.isFinite(vCount) || (row[17]||'').trim()===''){
+        const m2 = visitText.match(/(\d+)\s*명?\s*$/);
+        vCount = m2 ? Number(m2[1]) : NaN;
+      }
+      if(vDate && Number.isFinite(vCount)){
+        valid.push({ date:vDate, session:'AM', room:'visit', org:'기관', count:vCount, note:'' });
+      }
+    }
+  }
+  return { valid, skipped:0, total:valid.length, reasons:[] };
+}
+function parseImportRows(text){
+  const delimiter = detectDelimiter(text.slice(0,1000) || ',');
+  const raw = parseCsvRaw(text, delimiter);
+  if(raw.length===0) return { valid:[], skipped:0, total:0, reasons:['파일 내용이 비어 있습니다.'] };
+  if(looksLikePivotFormat(raw)){
+    // 날짜(0열)·방문일자(15열)에서만 연도를 찾는다 (전화번호 등 다른 칸의 숫자를 연도로 오인하지 않도록)
+    const fallbackYear = detectFallbackYear(raw, [0,15]);
+    return parsePivotFormat(raw, fallbackYear);
+  }
+
+  let headerMap = detectHeaderMap(raw[0]);
+  const requiredKeys = ['date','session','room','org','count'];
+  const matchedCount = requiredKeys.filter(k=>headerMap[k]!==undefined).length;
+  let dataRows;
+  if(matchedCount >= 4){
+    // 헤더를 이름으로 정상 인식 → 첫 줄은 헤더, 나머지가 데이터
+    dataRows = raw.slice(1);
+  }else{
+    // 헤더를 못 찾음 → 우리 기본 내보내기 순서(일자,요일,시간,프로그램실,구분,인원,비고)로 가정하고,
+    // 첫 줄도 헤더가 아니라 데이터일 수 있으니 함께 시도
+    headerMap = { date:0, session:2, room:3, org:4, count:5, note:6 };
+    const firstLooksLikeHeader = /[일날date]/i.test((raw[0][0]||'')) && !/^\d{4}/.test((raw[0][0]||'').trim());
+    dataRows = firstLooksLikeHeader ? raw.slice(1) : raw;
+  }
+  const fallbackYear = detectFallbackYear(raw, headerMap.date!==undefined ? [headerMap.date] : undefined);
+
+  const valid = []; const reasons = [];
+  let skipped = 0;
+  let lastDate = null, lastSession = null; // 병합된 셀(빈 칸)은 바로 위 행의 값을 이어받는다
+  dataRows.forEach((cols, rIdx)=>{
+    const get = k => headerMap[k]!==undefined ? cols[headerMap[k]] : undefined;
+    const rawDate = get('date');
+    let date = normalizeDate(rawDate, fallbackYear);
+    if(!date && (!rawDate || !rawDate.trim()) && lastDate){ date = lastDate; } // 날짜 칸이 비어있으면 직전 행의 날짜 이어받기
+    if(!date){ skipped++; if(reasons.length<3) reasons.push(`${rIdx+2}행: 날짜(${rawDate||'없음'})를 인식할 수 없습니다.`); return; }
+    lastDate = date;
+    const rawSession = get('session');
+    let session = normalizeSession(rawSession);
+    if(!session && (!rawSession || !rawSession.trim()) && lastSession){ session = lastSession; } // 시간 칸 병합 이어받기
+    if(!session){ skipped++; if(reasons.length<3) reasons.push(`${rIdx+2}행: 시간(${rawSession||'없음'})이 오전/오후로 인식되지 않습니다.`); return; }
+    lastSession = session;
+    const orgVal = normalizeOrg(get('org'));
+    if(!orgVal){ skipped++; if(reasons.length<3) reasons.push(`${rIdx+2}행: 구분(${get('org')||'없음'})이 유치원/초등학교/중학교/고등학교/특수학교/기관 중 하나로 인식되지 않습니다.`); return; }
+    const rawCount = (get('count')||'').toString();
+    const count = Number(rawCount.replace(/[^0-9.\-]/g,''));
+    if(!Number.isFinite(count) || rawCount.trim()===''){ skipped++; if(reasons.length<3) reasons.push(`${rIdx+2}행: 인원(${get('count')||'없음'})이 숫자로 인식되지 않습니다.`); return; }
+    const roomNameVal = (get('room')||'').trim();
+    if(!roomNameVal){ skipped++; if(reasons.length<3) reasons.push(`${rIdx+2}행: 프로그램실 칸이 비어 있습니다.`); return; }
+    let roomEntry = ROOMS.find(r=>r.name.trim()===roomNameVal || r.name.trim().toLowerCase()===roomNameVal.toLowerCase());
+    if(!roomEntry) roomEntry = ROOMS.find(r=>r.name.includes(roomNameVal) || roomNameVal.includes(r.name));
+    if(!roomEntry){
+      const newId = addCustomRoom(roomNameVal);
+      roomEntry = roomMap[newId];
+    }
+    valid.push({ date, session, room:roomEntry.id, org:orgVal, count, note:(get('note')||'').toString().trim() });
+  });
+  return { valid, skipped, total:dataRows.length, reasons };
+}
+document.getElementById('btnImportCsv').onclick = ()=>document.getElementById('csvFileInput').click();
+document.getElementById('csvFileInput').addEventListener('change', async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  let text;
+  try{ text = await file.text(); }catch(err){ await askAlert('파일을 읽을 수 없습니다.'); return; }
+  const { valid, skipped, total, reasons } = parseImportRows(text);
+  if(valid.length===0){
+    const detail = reasons && reasons.length ? '\n\n예시 오류:\n' + reasons.join('\n') : '';
+    await askAlert(`가져올 수 있는 일정이 없습니다. (전체 ${total||0}행 중 ${skipped||0}행 인식 실패)${detail}\n\n확인해주세요: ① 첫 줄에 일자/시간/프로그램실/구분/인원 항목이 있는지 ② 날짜가 2026-09-01, 2026.9.1, 9월 1일 중 한 형식인지 ③ 구분이 유치원·초등학교·중학교·고등학교·특수학교·기관 중 하나인지`);
+    return;
+  }
+  const detail = reasons && reasons.length ? '\n\n(참고 - 일부 오류 예시)\n' + reasons.join('\n') : '';
+  const msg = `${valid.length}건을 새 일정으로 추가합니다.` + (skipped>0 ? `\n형식이 맞지 않는 ${skipped}건은 건너뜁니다.${detail}` : '') + `\n\n계속할까요? (기존 일정은 삭제되지 않고, 추가만 됩니다)`;
+  const ok = await askConfirm(msg, {okText:'가져오기'});
+  if(!ok) return;
+  const newEntries = valid.map(v=>({ id:'e'+Date.now()+Math.random().toString(16).slice(2), ...v }));
+  entries.push(...newEntries);
+  persist();
+  newEntries.forEach(dbSetEntry);
+  renderRoomOptions(); fillRoomSelect();
+  renderAll();
+  await askAlert(`${newEntries.length}건을 추가했습니다.`);
+});
+
+
+/* ================= SEED DATA (2026학년도 2학기, 실제 강릉분원 시간표 기반) ================= */
+const SEED = [
+["2026-09-01","AM","upcycle","초등학교",2],["2026-09-01","AM","drawing","초등학교",11],
+["2026-09-01","AM","visit","기관",30],["2026-09-01","PM","visit","기관",10],
+["2026-09-02","AM","mask","초등학교",7],["2026-09-02","AM","drawing","초등학교",1],
+["2026-09-02","AM","visit","기관",1],["2026-09-02","PM","visit","기관",3],
+["2026-09-03","AM","mask","중학교",3],["2026-09-03","AM","visit","기관",6],
+["2026-09-03","PM","mask","중학교",3],["2026-09-03","PM","visit","기관",30],
+["2026-09-04","AM","barista","중학교",6],["2026-09-09","AM","mask","초등학교",2],
+["2026-09-09","AM","drawing","중학교",4],["2026-09-10","AM","mask","초등학교",2],
+["2026-09-11","AM","barista","중학교",3],["2026-09-11","PM","safety","중학교",3],
+["2026-09-14","PM","visit","기관",30],["2026-09-16","AM","mask","고등학교",7],
+["2026-09-16","AM","drawing","초등학교",6],["2026-09-16","AM","craft","고등학교",1],
+["2026-09-16","AM","esports","중학교",4],["2026-09-16","PM","mask","고등학교",1],
+["2026-09-17","AM","mask","중학교",1],["2026-09-17","AM","upcycle","중학교",4],
+["2026-09-17","AM","craft","고등학교",7],["2026-09-17","AM","visit","기관",50],
+["2026-09-17","AM","visit","기관",20],["2026-09-17","PM","mask","중학교",1],
+["2026-09-17","PM","upcycle","중학교",4],["2026-09-21","PM","visit","기관",15],
+["2026-09-22","AM","upcycle","중학교",1],["2026-09-22","PM","upcycle","중학교",1],
+["2026-09-23","AM","mask","초등학교",9],["2026-09-23","AM","drawing","유치원",8],
+["2026-09-29","AM","upcycle","유치원",8],["2026-09-29","AM","drawing","고등학교",5],
+["2026-09-29","PM","visit","기관",6],["2026-09-30","AM","mask","유치원",18],
+["2026-09-30","AM","drawing","초등학교",7],["2026-09-30","AM","craft","초등학교",1],
+["2026-10-01","AM","mask","중학교",5],["2026-10-02","AM","barista","중학교",5],
+["2026-10-06","AM","upcycle","중학교",4],["2026-10-06","AM","drawing","유치원",8],
+["2026-10-07","AM","mask","초등학교",3],["2026-10-07","AM","drawing","중학교",2,"변경신청"],
+["2026-10-07","AM","craft","초등학교",2],["2026-10-07","PM","mask","중학교",2,"변경신청"],
+["2026-10-08","AM","mask","초등학교",4,"취소"],["2026-10-08","AM","upcycle","중학교",4],
+["2026-10-08","AM","craft","초등학교",11],["2026-10-08","AM","club","고등학교",5],
+["2026-10-08","AM","cook","초등학교",9,"변경신청"],["2026-10-08","PM","mask","초등학교",4,"취소"],
+["2026-10-13","AM","upcycle","초등학교",3],["2026-10-13","AM","drawing","초등학교",9],
+["2026-10-13","AM","digital","초등학교",2],["2026-10-14","AM","mask","특수학교",5],
+["2026-10-14","AM","drawing","특수학교",5],["2026-10-14","AM","craft","유치원",8],
+["2026-10-15","AM","mask","초등학교",9],["2026-10-15","AM","craft","중학교",3],
+["2026-10-15","AM","club","유치원",5],["2026-10-15","AM","cook","초등학교",7],
+["2026-10-15","PM","craft","중학교",3],["2026-10-15","PM","cook","중학교",4,"변경신청"],
+["2026-10-16","AM","barista","특수학교",9],["2026-10-16","AM","cook","초등학교",3],
+["2026-10-20","AM","upcycle","초등학교",2],["2026-10-20","AM","drawing","고등학교",7],
+["2026-10-20","AM","digital","유치원",7],["2026-10-20","AM","cook","고등학교",1],
+["2026-10-20","PM","upcycle","유치원",6],["2026-10-20","PM","digital","고등학교",1],
+["2026-10-21","AM","mask","고등학교",5],["2026-10-21","AM","drawing","고등학교",5],
+["2026-10-21","AM","craft","고등학교",1],["2026-10-21","AM","esports","중학교",5],
+["2026-10-21","PM","mask","유치원",6],["2026-10-22","AM","mask","초등학교",13],
+["2026-10-22","AM","upcycle","초등학교",2],["2026-10-23","AM","barista","중학교",1],
+["2026-10-27","AM","upcycle","중학교",5],["2026-10-27","AM","drawing","초등학교",2],
+["2026-10-27","PM","visit","기관",1],["2026-10-28","AM","mask","특수학교",8],
+["2026-10-28","AM","drawing","특수학교",6],["2026-10-29","AM","mask","초등학교",2],
+["2026-10-29","AM","upcycle","중학교",4],["2026-10-30","AM","barista","초등학교",3],
+["2026-11-04","AM","mask","초등학교",12],["2026-11-04","AM","drawing","초등학교",6],
+["2026-11-05","AM","mask","중학교",3],["2026-11-05","AM","upcycle","고등학교",7],
+["2026-11-05","PM","mask","중학교",3],["2026-11-06","AM","barista","초등학교",6],
+["2026-11-06","AM","cook","중학교",1],["2026-11-10","AM","upcycle","중학교",4],
+["2026-11-11","AM","mask","초등학교",4,"날짜변경"],["2026-11-11","AM","drawing","초등학교",11],
+["2026-11-11","AM","craft","유치원",8],["2026-11-11","PM","mask","초등학교",4,"날짜변경"],
+["2026-11-11","PM","craft","중학교",4],["2026-11-11","PM","cook","초등학교",4],
+["2026-11-12","AM","mask","중학교",5],["2026-11-12","AM","upcycle","중학교",4],
+["2026-11-12","AM","craft","초등학교",3],["2026-11-12","PM","mask","중학교",5],
+["2026-11-16","PM","barista","중학교",5],["2026-11-16","PM","cook","초등학교",8],
+["2026-11-16","PM","cook","초등학교",4],["2026-11-16","PM","cook","고등학교",5,"중복신청 확인됨"],
+["2026-11-17","AM","upcycle","중학교",5],["2026-11-17","AM","drawing","중학교",4],
+["2026-11-17","AM","digital","초등학교",2],["2026-11-17","PM","upcycle","중학교",6],
+["2026-11-18","AM","mask","초등학교",2],["2026-11-18","AM","drawing","중학교",4],
+["2026-11-18","AM","craft","중학교",5],["2026-11-18","AM","esports","초등학교",6],
+["2026-11-18","AM","cook","초등학교",7],["2026-11-19","AM","mask","중학교",13],
+["2026-11-19","AM","upcycle","초등학교",9],["2026-11-19","AM","craft","초등학교",3],
+["2026-11-20","AM","barista","중학교",5],["2026-11-20","AM","cook","중학교",5],
+["2026-11-26","AM","mask","초등학교",11],["2026-11-27","AM","barista","초등학교",2],
+["2026-12-01","AM","upcycle","초등학교",9],["2026-12-02","AM","mask","초등학교",2],
+["2026-12-03","AM","mask","고등학교",5],["2026-12-03","AM","upcycle","중학교",5],
+["2026-12-03","AM","craft","유치원",8],["2026-12-03","PM","mask","고등학교",5],
+["2026-12-04","AM","barista","중학교",6],["2026-12-08","AM","upcycle","중학교",4],
+["2026-12-09","AM","mask","초등학교",6],["2026-12-09","AM","drawing","초등학교",2],
+["2026-12-09","AM","craft","초등학교",3],["2026-12-09","PM","craft","중학교",4],
+["2026-12-10","AM","mask","중학교",6],["2026-12-10","AM","upcycle","초등학교",9],
+["2026-12-10","AM","craft","중학교",5],["2026-12-11","AM","barista","초등학교",2],
+["2026-12-15","AM","upcycle","초등학교",2],["2026-12-17","AM","mask","중학교",5],
+["2026-12-17","AM","upcycle","초등학교",3],["2026-12-17","PM","mask","중학교",6],
+["2026-12-18","AM","barista","초등학교",9],["2026-12-23","AM","mask","중학교",5],
+["2026-12-24","AM","mask","특수학교",10]
+];
+
+function buildSeed(){
+  return SEED.map((r,i)=>({
+    id: 's'+i,
+    date:r[0], session:r[1], room:r[2], org:r[3], count:r[4], note:r[5]||''
+  }));
+}
+
+/* ================= STATE / STORAGE ================= */
+const STORE_KEY = 'gnBranchScheduleV1';
+let entries = [];
+try{
+  const raw = localStorage.getItem(STORE_KEY);
+  entries = raw ? JSON.parse(raw) : buildSeed();
+}catch(e){ entries = buildSeed(); }
+
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(entries)); }catch(e){}
+}
+
+let state = { tab:'table', year:'all', month:'all', room:'all', sess:'all', search:'', myRoomsOnly:false, printMode:'detail', calYear:2026, calMonth:9 };
+
+/* ================= HELPERS ================= */
+const WD = ['일','월','화','수','목','금','토'];
+function dObj(dateStr){ const [y,m,d]=dateStr.split('-').map(Number); return new Date(y,m-1,d); }
+function wd(dateStr){ return WD[dObj(dateStr).getDay()]; }
+function fmtDate(dateStr){ const [y,m,d]=dateStr.split('-'); return `${Number(m)}월 ${Number(d)}일`; }
+function monthKey(dateStr){ return dateStr.slice(0,7); }
+
+function filtered(){
+  return entries.filter(e=>{
+    if(state.year!=='all' && !e.date.startsWith(state.year)) return false;
+    if(state.month!=='all' && e.date.slice(5,7)!==state.month) return false;
+    if(state.room!=='all' && e.room!==state.room) return false;
+    if(state.sess!=='all' && e.session!==state.sess) return false;
+    if(state.myRoomsOnly && myRooms.length>0 && !myRooms.includes(e.room)) return false;
+    if(state.search){
+      const q = state.search.toLowerCase();
+      if(!(e.org.toLowerCase().includes(q) || (e.note||'').toLowerCase().includes(q))) return false;
+    }
+    return true;
+  }).sort((a,b)=> a.date===b.date ? (a.session==='AM'?-1:1) - (b.session==='AM'?-1:1) : a.date.localeCompare(b.date));
+}
+
+/* ================= RENDER: FILTER BAR ================= */
+function renderRoomOptions(){
+  const sel = document.getElementById('roomFilter');
+  sel.innerHTML = '<option value="all">모든 실 (전체)</option>' +
+    ROOMS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+}
+const MONTH_ORDER = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+const MONTH_LABELS = {'01':'1월','02':'2월','03':'3월','04':'4월','05':'5월','06':'6월','07':'7월','08':'8월','09':'9월','10':'10월','11':'11월','12':'12월'};
+function distinctYears(){ return [...new Set(entries.map(e=>e.date.slice(0,4)))].sort(); }
+function renderYearOptions(){
+  const sel = document.getElementById('yearFilter');
+  const prev = sel.value || state.year;
+  const years = distinctYears();
+  sel.innerHTML = '<option value="all">연도: 전체</option>' + years.map(y=>`<option value="${y}">${y}년</option>`).join('');
+  sel.value = years.includes(prev) ? prev : 'all';
+  state.year = sel.value;
+}
+function renderMonthOptions(){
+  // 항상 1~12월 전체를 고정으로 보여준다 (데이터 유무와 무관)
+  const sel = document.getElementById('monthFilter');
+  sel.innerHTML = '<option value="all">월: 전체</option>' +
+    MONTH_ORDER.map(m=>`<option value="${m}">${MONTH_LABELS[m]}</option>`).join('');
+  sel.value = state.month;
+}
+document.getElementById('yearFilter').addEventListener('change', e=>{ state.year = e.target.value; renderAll(); });
+document.getElementById('monthFilter').addEventListener('change', e=>{ state.month = e.target.value; jumpCalendarToFilter(); renderAll(); });
+// 필터에서 특정 연/월을 고르면 캘린더 탭도 그 달로 이동시킨다
+function jumpCalendarToFilter(){
+  if(state.month==='all') return;
+  let y = state.year!=='all' ? state.year : null;
+  if(!y){
+    const hit = entries.find(e=>e.date.slice(5,7)===state.month);
+    if(hit) y = hit.date.slice(0,4);
+  }
+  if(y){
+    state.calYear = Number(y);
+    state.calMonth = Number(state.month);
+  }
+}
+
+/* ================= RENDER: TABLE ================= */
+function weatherLinkFor(dateStr){
+  const [y,m,d] = dateStr.split('-');
+  const q = `강릉 날씨 ${Number(y)}년 ${Number(m)}월 ${Number(d)}일`;
+  return `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`;
+}
+function weatherBadge(e){
+  if(e.room!=='upcycle') return '';
+  return `<a href="${weatherLinkFor(e.date)}" target="_blank" rel="noopener noreferrer" title="강릉 날씨 확인 (새 창, 야외활동 실이라 날씨를 확인해보세요)" style="margin-left:6px; text-decoration:none; font-size:13px;" onclick="event.stopPropagation();">🌤️</a>`;
+}
+function renderTable(){
+  const rows = filtered();
+  const body = document.getElementById('tableBody');
+  if(rows.length===0){ body.innerHTML = `<tr class="empty-row"><td colspan="6">조건에 맞는 일정이 없습니다.</td></tr>`; return; }
+  body.innerHTML = rows.map(e=>{
+    const r = roomMap[e.room];
+    return `<tr data-id="${e.id}">
+      <td class="daycell" data-label="일자">${fmtDate(e.date)}<span class="wd">(${wd(e.date)})</span></td>
+      <td data-label="시간"><span class="sess ${e.session.toLowerCase()}">${e.session==='AM'?'오전':'오후'}</span></td>
+      <td data-label="프로그램실"><span class="roomtag" style="background:color-mix(in srgb, ${r.color} 16%, transparent); color:${r.color};"><span class="roomdot" style="background:${r.color};"></span>${r.name}</span>${weatherBadge(e)}</td>
+      <td data-label="구분/비고"><span class="org">${escapeHtml(e.org)}</span>${e.note?` <span class="note">· ${escapeHtml(e.note)}</span>`:''}</td>
+      <td data-label="인원"><span class="count">${e.count}명</span></td>
+      <td class="no-print" data-label="">
+        <div class="rowops">
+          <button class="btn small" onclick="openEdit('${e.id}')">수정</button>
+          <button class="btn small danger" onclick="removeEntry('${e.id}')">삭제</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ================= RENDER: CALENDAR ================= */
+function renderCalendar(){
+  document.getElementById('calTitle').textContent = `${state.calYear}년 ${state.calMonth}월`;
+  const grid = document.getElementById('calGrid');
+  const dowRow = WD.map((d,i)=>`<div class="cal-dow ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
+  const first = new Date(state.calYear, state.calMonth-1, 1);
+  const startDow = first.getDay();
+  const daysInMonth = new Date(state.calYear, state.calMonth, 0).getDate();
+  const mKey = `${state.calYear}-${String(state.calMonth).padStart(2,'0')}`;
+
+  let cells = '';
+  for(let i=0;i<startDow;i++) cells += `<div class="cal-day empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateStr = `${mKey}-${String(d).padStart(2,'0')}`;
+    const dayEntries = filtered().filter(e=>e.date===dateStr && (state.month==='all'||true));
+    const allDayEntries = entries.filter(e=>e.date===dateStr).filter(e=>{
+      if(state.room!=='all' && e.room!==state.room) return false;
+      if(state.sess!=='all' && e.session!==state.sess) return false;
+      return true;
+    });
+    const total = allDayEntries.reduce((s,e)=>s+Number(e.count),0);
+    const dow = (startDow + d - 1) % 7;
+    const shown = allDayEntries.slice(0,3);
+    const more = allDayEntries.length - shown.length;
+    const note = dayNotes[dateStr];
+    const hasUpcycle = allDayEntries.some(e=>e.room==='upcycle');
+    cells += `<div class="cal-day" onclick="openDay('${dateStr}')">
+      <div class="dnum ${dow===0?'sun':dow===6?'sat':''}"><span>${d}${hasUpcycle?' 🌤️':''}</span>${total?`<span class="cal-count">👥${total}</span>`:''}</div>
+      ${note?`<div class="cal-item" style="background:#fde68a; color:#92400e; font-weight:800;" title="${escapeHtml(note)}">📌 ${escapeHtml(note)}</div>`:''}
+      ${shown.map(e=>{const r=roomMap[e.room]; return `<div class="cal-item" style="background:color-mix(in srgb, ${r.color} 18%, transparent); color:${r.color};">${escapeHtml(e.org)} ${e.count}명</div>`;}).join('')}
+      ${more>0?`<div class="cal-more">+${more}건 더보기</div>`:''}
+      ${allDayEntries.length===0 && !note?`<div class="cal-empty-label">일정 없음</div>`:''}
+    </div>`;
+  }
+  grid.innerHTML = dowRow + cells;
+}
+
+document.getElementById('calPrev').onclick=()=>{
+  state.calMonth--; if(state.calMonth<9){ state.calMonth=12; state.calYear--; } // clamp-ish for this schedule range
+  if(state.calMonth<1){state.calMonth=12; state.calYear--;}
+  renderCalendar();
+};
+document.getElementById('calNext').onclick=()=>{
+  state.calMonth++; if(state.calMonth>12){ state.calMonth=1; state.calYear++; }
+  renderCalendar();
+};
+
+/* ================= RENDER: ROOMS ================= */
+let selectedRoom = null;
+function renderRooms(){
+  const grid = document.getElementById('roomGrid');
+  grid.innerHTML = ROOMS.map(r=>{
+    const list = entries.filter(e=>e.room===r.id);
+    const sessions = list.length;
+    const total = list.reduce((s,e)=>s+Number(e.count),0);
+    const isDark = r.color==='#1f2937';
+    return `<div class="card room-card ${selectedRoom===r.id?'selected':''}" onclick="selectRoom('${r.id}')" style="${isDark?'background:#1f2937;color:#fff;':''}">
+      <div class="top">
+        <span class="roomtag" style="background:${isDark?'rgba(255,255,255,.15)':`color-mix(in srgb, ${r.color} 16%, transparent)`}; color:${isDark?'#fff':r.color};"><span class="roomdot" style="background:${isDark?'#fff':r.color};"></span>${sessions}회 운영</span>
+      </div>
+      <div class="name">${r.name}</div>
+      <div class="desc" style="${isDark?'color:rgba(255,255,255,.65);':''}">${r.desc}</div>
+      <div class="num" style="${isDark?'color:#fff;':''}">${total}<span>명 참석</span></div>
+    </div>`;
+  }).join('');
+  renderRoomDetail();
+}
+function selectRoom(id){ selectedRoom = (selectedRoom===id)?null:id; renderRooms(); }
+function renderRoomDetail(){
+  const card = document.getElementById('roomDetailCard');
+  const body = document.getElementById('roomDetailBody');
+  if(!selectedRoom){ card.style.display='none'; return; }
+  card.style.display='block';
+  const list = entries.filter(e=>e.room===selectedRoom).sort((a,b)=>a.date.localeCompare(b.date));
+  body.innerHTML = list.map(e=>`<tr>
+    <td class="daycell">${fmtDate(e.date)}<span class="wd">(${wd(e.date)})</span></td>
+    <td><span class="sess ${e.session.toLowerCase()}">${e.session==='AM'?'오전':'오후'}</span></td>
+    <td><span class="org">${escapeHtml(e.org)}</span>${e.note?` <span class="note">· ${escapeHtml(e.note)}</span>`:''}</td>
+    <td><span class="count">${e.count}명</span></td>
+  </tr>`).join('') || `<tr class="empty-row"><td colspan="4">데이터가 없습니다.</td></tr>`;
+}
+
+/* ================= RENDER: YEARS ================= */
+const CAT_ORDER = ['유치원','초등학교','중학교','고등학교','특수학교','기관'];
+const CAT_COLORS = {'유치원':'#ca8a04','초등학교':'#2563eb','중학교':'#059669','고등학교':'#8b5cf6','특수학교':'#db2777','기관':'#64748b'};
+let selectedYear = null;
+function renderYears(){
+  const grid = document.getElementById('yearGrid');
+  const years = distinctYears();
+  grid.innerHTML = years.map(y=>{
+    const list = entries.filter(e=>e.date.startsWith(y));
+    const total = list.reduce((s,e)=>s+Number(e.count),0);
+    const sessions = list.length;
+    const months = [...new Set(list.map(e=>e.date.slice(5,7)))].sort();
+    const range = months.length ? `${Number(months[0])}월 ~ ${Number(months[months.length-1])}월 운영` : '데이터 없음';
+    const byCat = {};
+    list.forEach(e=>{ byCat[e.org] = (byCat[e.org]||0) + Number(e.count); });
+    return `<div class="card room-card ${selectedYear===y?'selected':''}" onclick="selectYear('${y}')">
+      <div class="top"><span class="roomtag" style="background:var(--accent-dim); color:var(--accent);"><span class="roomdot" style="background:var(--accent);"></span>${sessions}회 운영</span></div>
+      <div class="name">${y}년</div>
+      <div class="desc">${range}</div>
+      <div class="num">${total}<span>명 참석</span></div>
+      <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+        ${CAT_ORDER.filter(c=>byCat[c]).map(c=>`<span class="roomtag" style="background:color-mix(in srgb, ${CAT_COLORS[c]} 16%, transparent); color:${CAT_COLORS[c]};"><span class="roomdot" style="background:${CAT_COLORS[c]};"></span>${c} ${byCat[c]}명</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('') || `<div class="card" style="padding:30px; text-align:center; color:var(--text-faint);">등록된 일정이 없습니다.</div>`;
+  renderYearCompareChart();
+  renderYearMatrix();
+  renderYearDetail();
+}
+const YEAR_PALETTE = ['#2563eb','#db2777','#059669','#ca8a04','#7c3aed','#0891b2','#dc2626'];
+function renderYearCompareChart(){
+  const card = document.getElementById('yearCompareCard');
+  const years = distinctYears();
+  if(years.length===0){ card.style.display='none'; return; }
+  card.style.display='block';
+  const dataByYear = {};
+  years.forEach(y=>{
+    dataByYear[y] = MONTH_ORDER.map(m=> entries.filter(e=>e.date.startsWith(y) && e.date.slice(5,7)===m).reduce((s,e)=>s+Number(e.count),0));
+  });
+  const maxVal = Math.max(1, ...years.flatMap(y=>dataByYear[y]));
+  const W = 900, H = 260, padL=34, padB=26, padT=10, padR=10;
+  const chartW = W-padL-padR, chartH = H-padT-padB;
+  const groupW = chartW/12;
+  const barW = Math.min(24, (groupW-10)/Math.max(1,years.length));
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block;">`;
+  for(let g=0; g<=4; g++){
+    const gy = padT + chartH - (g/4)*chartH;
+    svg += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="var(--border)" stroke-width="1"/>`;
+    svg += `<text x="${padL-6}" y="${gy+3}" font-size="9" text-anchor="end" fill="var(--text-faint)">${Math.round(g/4*maxVal)}</text>`;
+  }
+  MONTH_ORDER.forEach((m, mi)=>{
+    const gx = padL + mi*groupW;
+    years.forEach((y, yi)=>{
+      const val = dataByYear[y][mi];
+      const bh = maxVal ? (val/maxVal)*chartH : 0;
+      const bx = gx + (groupW - years.length*barW)/2 + yi*barW;
+      const by = padT + chartH - bh;
+      svg += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${Math.max(0,barW-3).toFixed(1)}" height="${bh.toFixed(1)}" fill="${YEAR_PALETTE[yi%YEAR_PALETTE.length]}" rx="2"><title>${y}년 ${Number(m)}월: ${val}명</title></rect>`;
+    });
+    svg += `<text x="${(gx+groupW/2).toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="var(--text-dim)">${Number(m)}월</text>`;
+  });
+  svg += `</svg>`;
+  document.getElementById('yearCompareChart').innerHTML = svg;
+  document.getElementById('yearCompareLegend').innerHTML = years.map((y,i)=>`<span style="display:inline-flex; align-items:center; gap:5px; margin-right:14px; font-size:12px; color:var(--text-dim); font-weight:700;"><span style="width:10px; height:10px; border-radius:3px; background:${YEAR_PALETTE[i%YEAR_PALETTE.length]}; display:inline-block;"></span>${y}년</span>`).join('') +
+    (years.length<2 ? `<span style="font-size:11.5px; color:var(--text-faint);">· 다른 연도 일정이 추가되면 이 자리에 자동으로 비교 막대가 늘어납니다</span>` : '');
+}
+function selectYear(y){ selectedYear = (selectedYear===y)?null:y; renderYears(); }
+function renderYearMatrix(){
+  const card = document.getElementById('yearMatrixCard');
+  if(!selectedYear){ card.style.display='none'; return; }
+  card.style.display='block';
+  document.getElementById('yearMatrixTitle').textContent = `${selectedYear}년 · 학교급별 / 월별 참석 인원`;
+  const list = entries.filter(e=>e.date.startsWith(selectedYear));
+  const matrix = {};
+  let maxVal = 0;
+  CAT_ORDER.forEach(cat=>{
+    matrix[cat] = MONTH_ORDER.map(m=>{
+      const v = list.filter(e=>e.org===cat && e.date.slice(5,7)===m).reduce((s,e)=>s+Number(e.count),0);
+      if(v>maxVal) maxVal = v;
+      return v;
+    });
+  });
+  const rowTotals = CAT_ORDER.map(cat=>matrix[cat].reduce((a,b)=>a+b,0));
+  const colTotals = MONTH_ORDER.map((_,i)=>CAT_ORDER.reduce((s,cat)=>s+matrix[cat][i],0));
+  const grandTotal = rowTotals.reduce((a,b)=>a+b,0);
+  let html = '<thead><tr><th style="text-align:left; padding:6px 10px; font-size:11.5px; color:var(--text-dim);">구분</th>' +
+    MONTH_ORDER.map(m=>`<th style="padding:6px 8px; font-size:11.5px; color:var(--text-dim); text-align:center;">${Number(m)}월</th>`).join('') +
+    '<th style="padding:6px 10px; font-size:11.5px; color:var(--text-dim); text-align:center;">합계</th></tr></thead><tbody>';
+  CAT_ORDER.forEach((cat,ci)=>{
+    const color = CAT_COLORS[cat];
+    html += `<tr><td style="padding:6px 10px; font-size:12.5px; font-weight:700; white-space:nowrap;"><span class="roomdot" style="background:${color}; display:inline-block; margin-right:6px;"></span>${cat}</td>` +
+      matrix[cat].map(v=>{
+        const op = maxVal ? Math.min(0.85, 0.12 + 0.7*(v/maxVal)) : 0;
+        return `<td style="text-align:center; padding:6px 4px; font-size:12px; font-weight:${v?'700':'400'}; color:${v?'#fff':'var(--text-faint)'}; background:${v?`color-mix(in srgb, ${color} ${Math.round(op*100)}%, transparent)`:'transparent'}; border-radius:6px;">${v||'-'}</td>`;
+      }).join('') +
+      `<td style="text-align:center; padding:6px 8px; font-size:12.5px; font-weight:800;">${rowTotals[ci]||'-'}</td></tr>`;
+  });
+  html += `<tr><td style="padding:8px 10px; font-size:12px; font-weight:700; color:var(--text-dim); border-top:1px solid var(--border);">월 합계</td>` +
+    colTotals.map(v=>`<td style="text-align:center; padding:8px 4px; font-size:12px; font-weight:700; color:var(--text-dim); border-top:1px solid var(--border);">${v||'-'}</td>`).join('') +
+    `<td style="text-align:center; padding:8px 8px; font-size:13px; font-weight:900; border-top:1px solid var(--border);">${grandTotal}</td></tr>`;
+  html += '</tbody>';
+  document.getElementById('yearMatrixTable').innerHTML = html;
+}
+function renderYearDetail(){
+  const card = document.getElementById('yearDetailCard');
+  const body = document.getElementById('yearDetailBody');
+  if(!selectedYear){ card.style.display='none'; return; }
+  card.style.display='block';
+  const list = entries.filter(e=>e.date.startsWith(selectedYear)).sort((a,b)=> a.date===b.date ? (a.session==='AM'?-1:1)-(b.session==='AM'?-1:1) : a.date.localeCompare(b.date));
+  body.innerHTML = list.map(e=>{
+    const r = roomMap[e.room];
+    return `<tr>
+      <td class="daycell">${fmtDate(e.date)}<span class="wd">(${wd(e.date)})</span></td>
+      <td><span class="sess ${e.session.toLowerCase()}">${e.session==='AM'?'오전':'오후'}</span></td>
+      <td><span class="roomtag" style="background:color-mix(in srgb, ${r.color} 16%, transparent); color:${r.color};"><span class="roomdot" style="background:${r.color};"></span>${r.name}</span></td>
+      <td><span class="org">${escapeHtml(e.org)}</span>${e.note?` <span class="note">· ${escapeHtml(e.note)}</span>`:''}</td>
+      <td><span class="count">${e.count}명</span></td>
+    </tr>`;
+  }).join('') || `<tr class="empty-row"><td colspan="5">데이터가 없습니다.</td></tr>`;
+}
+
+/* ================= RENDER: PRINT ================= */
+function renderPrint(){
+  const scoped = state.year==='all' ? entries : entries.filter(e=>e.date.startsWith(state.year));
+  const dates = [...new Set(scoped.map(e=>e.date))].sort();
+  if(dates.length){
+    document.getElementById('pRange').textContent = `${fmtDate(dates[0])} ~ ${fmtDate(dates[dates.length-1])} (${dates[0].slice(0,4)}~${dates[dates.length-1].slice(0,4)})`;
+  }else{
+    document.getElementById('pRange').textContent = '데이터 없음';
+  }
+  if(state.printMode==='summary'){ renderPrintSummary(scoped); }
+  else{ renderPrintDetail(scoped); }
+}
+function renderPrintDetail(scoped){
+  document.getElementById('pTitle').textContent = '강릉분원 정규 프로그램 일정표';
+  document.getElementById('pSub').textContent = '2학기 특수 및 직업진로체험 정규과정 편성표 · 참석 인원수 기준';
+  const yms = [...new Set(scoped.map(e=>e.date.slice(0,7)))].sort();
+  const blocks = yms.map(ym=>{
+    const [y,m] = ym.split('-');
+    const groupDates = [...new Set(scoped.filter(e=>e.date.startsWith(ym)).map(e=>e.date))].sort();
+    const body = groupDates.map(d=>{
+      const list = scoped.filter(e=>e.date===d).sort((a,b)=>(a.session==='AM'?-1:1)-(b.session==='AM'?-1:1));
+      const total = list.reduce((s,e)=>s+Number(e.count),0);
+      return `<div class="p-date"><span>${fmtDate(d)} (${wd(d)})</span><span>총 ${total}명</span></div>
+        ${list.map(e=>`<div class="p-line"><span>[${e.session==='AM'?'오전':'오후'}] ${roomMap[e.room].name}: ${escapeHtml(e.org)}${e.note?` (${escapeHtml(e.note)})`:''}</span><b>${e.count}명</b></div>`).join('')}`;
+    }).join('');
+    return `<div class="p-month"><h4>【 ${y}년 ${Number(m)}월 정규 프로그램 편성표 】</h4>${body || '<div class="p-line">일정 없음</div>'}</div>`;
+  });
+  const col1 = blocks.filter((_,i)=>i%2===0).join('');
+  const col2 = blocks.filter((_,i)=>i%2===1).join('');
+  document.getElementById('printCols').innerHTML = `<div>${col1}</div><div>${col2}</div>`;
+}
+function renderPrintSummary(scoped){
+  const periodLabel = state.year==='all' ? '전체 기간' : `${state.year}년`;
+  document.getElementById('pTitle').textContent = `강릉분원 프로그램 운영 요약 (${periodLabel})`;
+  document.getElementById('pSub').textContent = '학교급별 · 프로그램실별 · 월별 참석 인원 요약 통계';
+
+  const grandTotal = scoped.reduce((s,e)=>s+Number(e.count),0);
+  const grandSessions = scoped.length;
+
+  // 1) 학교급별 요약
+  const catRows = CAT_ORDER.map(cat=>{
+    const list = scoped.filter(e=>e.org===cat);
+    return { label:cat, sessions:list.length, total:list.reduce((s,e)=>s+Number(e.count),0) };
+  }).filter(r=>r.sessions>0);
+
+  // 2) 프로그램실별 요약
+  const roomRows = ROOMS.map(r=>{
+    const list = scoped.filter(e=>e.room===r.id);
+    return { label:r.name, sessions:list.length, total:list.reduce((s,e)=>s+Number(e.count),0) };
+  }).filter(r=>r.sessions>0).sort((a,b)=>b.total-a.total);
+
+  // 3) 월별 요약
+  const yms = [...new Set(scoped.map(e=>e.date.slice(0,7)))].sort();
+  const monthRows = yms.map(ym=>{
+    const [y,m] = ym.split('-');
+    const list = scoped.filter(e=>e.date.startsWith(ym));
+    return { label:`${y}년 ${Number(m)}월`, sessions:list.length, total:list.reduce((s,e)=>s+Number(e.count),0) };
+  });
+
+  function miniTable(title, rows){
+    return `<div class="p-month"><h4>【 ${title} 】</h4>
+      <div class="p-line" style="font-weight:800; border-bottom:1px solid #999; padding-bottom:4px;"><span>구분</span><span>세션 / 인원</span></div>
+      ${rows.map(r=>`<div class="p-line"><span>${escapeHtml(r.label)}</span><b>${r.sessions}회 · ${r.total}명</b></div>`).join('') || '<div class="p-line">데이터 없음</div>'}
+      </div>`;
+  }
+
+  const totalBlock = `<div class="p-month"><h4>【 전체 총계 (${periodLabel}) 】</h4>
+    <div class="p-line"><span>총 운영 세션</span><b>${grandSessions}회</b></div>
+    <div class="p-line"><span>총 참석 인원</span><b>${grandTotal}명</b></div>
+    </div>`;
+
+  const col1 = totalBlock + miniTable('학교급별 요약', catRows);
+  const col2 = miniTable('프로그램실별 요약', roomRows) + miniTable('월별 요약', monthRows);
+  document.getElementById('printCols').innerHTML = `<div>${col1}</div><div>${col2}</div>`;
+}
+document.getElementById('printModeGroup').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  state.printMode = btn.dataset.v;
+  [...document.getElementById('printModeGroup').children].forEach(b=>b.classList.toggle('active', b===btn));
+  renderPrint();
+});
+
+/* ================= STATS + RESULT CHIP ================= */
+function renderStats(){
+  document.getElementById('statTotalCount').textContent = entries.reduce((s,e)=>s+Number(e.count),0);
+  document.getElementById('statTotalSessions').textContent = entries.length;
+  const rows = filtered();
+  document.getElementById('resultChip').innerHTML = `조회 결과: <b>${rows.length}</b>개 일정 / 참석 합계 <b>${rows.reduce((s,e)=>s+Number(e.count),0)}</b>명`;
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
+function weekRange(dateStr){
+  // 월요일 시작 ~ 일요일 끝
+  const d = dObj(dateStr);
+  const dow = d.getDay(); // 0=일
+  const diffToMon = (dow===0) ? -6 : (1-dow);
+  const mon = new Date(d); mon.setDate(d.getDate()+diffToMon);
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  const fmt = x=>`${x.getFullYear()}-${pad2(x.getMonth()+1)}-${pad2(x.getDate())}`;
+  return { start: fmt(mon), end: fmt(sun) };
+}
+function renderTodayStrip(){
+  const t = todayStr();
+  const todayList = entries.filter(e=>e.date===t);
+  const todayCount = todayList.reduce((s,e)=>s+Number(e.count),0);
+  document.getElementById('todayCard').textContent = `📅 오늘(${fmtDate(t)}) 일정 ${todayList.length}건 · ${todayCount}명 →`;
+
+  const { start, end } = weekRange(t);
+  const weekList = entries.filter(e=>e.date>=start && e.date<=end);
+  const weekCount = weekList.reduce((s,e)=>s+Number(e.count),0);
+  document.getElementById('weekCard').textContent = `🗓 이번 주(${fmtDate(start)}~${fmtDate(end)}) 일정 ${weekList.length}건 · ${weekCount}명`;
+}
+document.getElementById('todayCard').onclick = ()=>{ openDay(todayStr()); };
+
+/* ================= TABS ================= */
+document.querySelectorAll('.tabbar button').forEach(btn=>{
+  btn.onclick = ()=>{
+    state.tab = btn.dataset.tab;
+    document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active', b===btn));
+    ['table','calendar','rooms','years','print'].forEach(t=>{
+      document.getElementById('view-'+t).style.display = (t===state.tab)?'':'none';
+    });
+    document.getElementById('filterbar').style.display = (state.tab==='print')?'none':'flex';
+    renderAll();
+  };
+});
+
+/* ================= FILTER EVENTS ================= */
+document.getElementById('roomFilter').onchange = (e)=>{ state.room = e.target.value; renderAll(); };
+document.getElementById('sessGroup').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  state.sess = btn.dataset.v;
+  [...document.getElementById('sessGroup').children].forEach(b=>b.classList.toggle('active', b===btn));
+  renderAll();
+});
+document.getElementById('searchBox').oninput = (e)=>{ state.search = e.target.value; renderAll(); };
+
+/* ================= MODAL: ADD / EDIT ================= */
+const overlay = document.getElementById('editOverlay');
+function fillRoomSelect(){
+  document.getElementById('f_room').innerHTML = ROOMS.map(r=>`<option value="${r.id}">${r.name}${r.custom?' (사용자 추가)':''}</option>`).join('');
+  updateRoomDeleteBtn();
+}
+function updateRoomDeleteBtn(){
+  const val = document.getElementById('f_room').value;
+  const r = roomMap[val];
+  document.getElementById('btnDeleteRoom').style.display = (r && r.custom) ? 'inline-flex' : 'none';
+}
+document.getElementById('f_room').addEventListener('change', updateRoomDeleteBtn);
+document.getElementById('btnAddRoom').onclick = async ()=>{
+  const name = await askPrompt('추가할 프로그램(실) 이름을 입력해주세요.\n예) 목공예 체험실, VR 진로체험실 등');
+  if(name === null || name.trim()==='') return;
+  const id = addCustomRoom(name);
+  if(!id){ return; }
+  renderRoomOptions();
+  fillRoomSelect();
+  document.getElementById('f_room').value = id;
+  updateRoomDeleteBtn();
+};
+document.getElementById('btnDeleteRoom').onclick = async ()=>{
+  const val = document.getElementById('f_room').value;
+  const r = roomMap[val];
+  if(!r || !r.custom) return;
+  const ok = await askConfirm(`'${r.name}' 프로그램을 목록에서 삭제할까요?`, {danger:true, okText:'삭제'});
+  if(!ok) return;
+  await removeCustomRoom(val);
+  fillRoomSelect();
+  document.getElementById('f_room').value = ROOMS[0].id;
+  updateRoomDeleteBtn();
+};
+function openAdd(prefDate){
+  renderTemplateChips();
+  document.getElementById('editTitle').textContent = '일정 추가';
+  document.getElementById('editId').value = '';
+  document.getElementById('f_date').value = prefDate || '2026-09-01';
+  document.getElementById('f_session').value = 'AM';
+  document.getElementById('f_room').value = ROOMS[0].id;
+  document.getElementById('f_org').value = '초등학교';
+  document.getElementById('f_count').value = 1;
+  document.getElementById('f_note').value = '';
+  updateRoomDeleteBtn();
+  overlay.classList.add('show');
+}
+function openEdit(id){
+  renderTemplateChips();
+  const e = entries.find(x=>x.id===id); if(!e) return;
+  document.getElementById('editTitle').textContent = '일정 수정';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_date').value = e.date;
+  document.getElementById('f_session').value = e.session;
+  document.getElementById('f_room').value = e.room;
+  document.getElementById('f_org').value = e.org;
+  document.getElementById('f_count').value = e.count;
+  document.getElementById('f_note').value = e.note || '';
+  updateRoomDeleteBtn();
+  overlay.classList.add('show');
+}
+function closeEdit(){ overlay.classList.remove('show'); }
+document.getElementById('btnCancelEdit').onclick = closeEdit;
+document.getElementById('btnAdd').onclick = ()=>openAdd();
+document.getElementById('btnSaveEdit').onclick = async ()=>{
+  const id = document.getElementById('editId').value;
+  const date = document.getElementById('f_date').value;
+  const org = document.getElementById('f_org').value.trim();
+  if(!date || !org){ await askAlert('날짜와 구분을 선택해주세요.'); return; }
+  const data = {
+    date,
+    session: document.getElementById('f_session').value,
+    room: document.getElementById('f_room').value,
+    org,
+    count: Number(document.getElementById('f_count').value)||0,
+    note: document.getElementById('f_note').value.trim()
+  };
+  if(id){
+    const idx = entries.findIndex(x=>x.id===id);
+    entries[idx] = {...entries[idx], ...data};
+    dbSetEntry(entries[idx]);
+  }else{
+    const newId = 'e'+Date.now()+Math.random().toString(16).slice(2);
+    const newEntry = {id:newId, ...data};
+    entries.push(newEntry);
+    dbSetEntry(newEntry);
+  }
+  persist();
+  closeEdit();
+  renderAll();
+};
+async function removeEntry(id){
+  const ok = await askConfirm('이 일정을 삭제할까요?', {danger:true, okText:'삭제'});
+  if(!ok) return;
+  entries = entries.filter(e=>e.id!==id);
+  dbDeleteEntry(id);
+  persist();
+  renderAll();
+}
+
+/* ================= MODAL: DAY DETAIL ================= */
+const dayOverlay = document.getElementById('dayOverlay');
+let currentDay = null;
+function openDay(dateStr){
+  currentDay = dateStr;
+  document.getElementById('dayTitle').textContent = `${fmtDate(dateStr)} (${wd(dateStr)}) 일정`;
+  document.getElementById('dayNoteInput').value = dayNotes[dateStr] || '';
+  renderDayList();
+  dayOverlay.classList.add('show');
+}
+document.getElementById('btnSaveDayNote').onclick = ()=>{
+  const text = document.getElementById('dayNoteInput').value.trim();
+  if(text){ dayNotes[currentDay] = text; dbSetDayNote(currentDay, text); }
+  else{ delete dayNotes[currentDay]; dbDeleteDayNote(currentDay); }
+  persistDayNotes();
+  if(state.tab==='calendar') renderCalendar();
+};
+function renderDayList(){
+  const list = entries.filter(e=>e.date===currentDay).sort((a,b)=>(a.session==='AM'?-1:1)-(b.session==='AM'?-1:1));
+  const box = document.getElementById('dayList');
+  box.innerHTML = list.length ? list.map(e=>{
+    const r = roomMap[e.room];
+    return `<div class="daymodal-item">
+      <span class="roomdot" style="background:${r.color};"></span>
+      <div class="grow"><b>${escapeHtml(e.org)} · ${e.count}명</b><span class="note">${e.session==='AM'?'오전':'오후'} · ${r.name}${e.note?` · ${escapeHtml(e.note)}`:''}</span></div>
+      ${weatherBadge(e)}
+      <button class="btn small" onclick="closeDayThenEdit('${e.id}')">수정</button>
+      <button class="btn small danger" onclick="removeEntryFromDay('${e.id}')">삭제</button>
+    </div>`;
+  }).join('') : `<div style="text-align:center; color:var(--text-faint); padding:20px 0;">등록된 일정이 없습니다.</div>`;
+}
+function closeDayThenEdit(id){ dayOverlay.classList.remove('show'); openEdit(id); }
+async function removeEntryFromDay(id){ await removeEntry(id); renderDayList(); }
+document.getElementById('btnCloseDay').onclick = ()=>dayOverlay.classList.remove('show');
+document.getElementById('btnAddInDay').onclick = ()=>{ dayOverlay.classList.remove('show'); openAdd(currentDay); };
+
+/* ================= PRINT / RESET ================= */
+function doPrint(){ window.print(); }
+document.getElementById('btnPrintTop').onclick = ()=>{
+  state.tab='print';
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.tab==='print'));
+  ['table','calendar','rooms','years','print'].forEach(t=>document.getElementById('view-'+t).style.display = (t==='print')?'':'none');
+  document.getElementById('filterbar').style.display='none';
+  renderAll();
+  setTimeout(doPrint, 150);
+};
+document.getElementById('btnPrintNow').onclick = doPrint;
+document.getElementById('btnReset').onclick = async ()=>{
+  const msg = dbAvailable
+    ? '⚠️ 이 데이터는 조직 전체와 실시간 공유되고 있습니다. 정말 모든 직원의 수정 내용을 지우고 원본 데이터로 되돌릴까요? 이 작업은 되돌릴 수 없습니다.'
+    : '모든 수정 내용을 지우고 원본 데이터로 되돌릴까요? 이 작업은 되돌릴 수 없습니다.';
+  const ok = await askConfirm(msg, {danger:true, okText:'초기화'});
+  if(!ok) return;
+  const oldIds = entries.map(e=>e.id);
+  entries = buildSeed();
+  persist();
+  renderAll();
+  if(dbAvailable){
+    try{
+      await Promise.all(oldIds.map(id=>dbApi.collection('entries').doc(id).delete().catch(()=>{})));
+      entriesSeeded = true;
+      await chunkedSet(entries.map(s=>({
+        ref: dbApi.collection('entries').doc(s.id),
+        data: { date:s.date, session:s.session, room:s.room, org:s.org, count:Number(s.count)||0, note:s.note||'' }
+      })));
+    }catch(e){ console.warn('shared reset failed', e); }
+  }
+};
+
+/* ================= MASTER RENDER ================= */
+function renderAll(){
+  renderYearOptions();
+  renderStats();
+  renderTodayStrip();
+  if(state.tab==='table') renderTable();
+  if(state.tab==='calendar') renderCalendar();
+  if(state.tab==='rooms') renderRooms();
+  if(state.tab==='years') renderYears();
+  if(state.tab==='print') renderPrint();
+}
+
+/* ================= INIT ================= */
+renderRoomOptions();
+renderYearOptions();
+renderMonthOptions();
+fillRoomSelect();
+updateMyRoomsToggleBtn();
+renderAll();
+initCollab();
+</script>
+</body>
+</html>
