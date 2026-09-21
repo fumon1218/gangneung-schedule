@@ -5,214 +5,302 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>강릉분원 정규 프로그램 일정표</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Firebase (GitHub Pages 등 claude.ai 밖에서 팀 실시간 공유를 위해 사용. claude.ai 아티팩트에서는 사용되지 않습니다) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
+  /* =====================================================================
+     디자인: 교회 캘린더(동해교회 달력) 스타일
+     - 따뜻한 베이지 바탕 + 남색 포인트 + 세리프 제목 + 알약 모양 버튼
+     - 색상은 모두 아래 변수에서 바꿀 수 있습니다 (라이트/다크 각각)
+     ===================================================================== */
   :root{
-    --bg:#f4f6f9; --card:#ffffff; --border:#e5e9f0; --border-strong:#d7dce5;
-    --text:#1b2432; --text-dim:#6b7686; --text-faint:#9aa4b2;
-    --accent:#2563eb; --accent-dim:#e8f0fe; --accent-strong:#1d4ed8;
-    --danger:#e11d48; --danger-dim:#fde8ec;
-    --green:#059669; --green-dim:#e3f7ef;
-    --shadow:0 1px 2px rgba(20,30,50,.04), 0 4px 14px rgba(20,30,50,.05);
-    --radius:16px;
+    --bg:#EDE8DA; --card:#FFFFFF; --soft:#F7F3EB; --hover:#EFE9DC;
+    --border:#EBE5D5; --border-strong:#DCD4BD;
+    --text:#222B32; --text-dim:#5C6773; --text-faint:#929CA6;
+    --accent:#344B68; --accent-dim:#E4EAF2; --accent-strong:#263850; --on-accent:#FFFFFF;
+    --danger:#B24638; --danger-dim:#F6E4E0;
+    --green:#3E7C74; --green-dim:#E6F1EF;
+    --blue:#3A69A7; --amber:#A5793A; --amber-dim:#FBF3E4;
+    --edu:#7A5C8C;
+    --shadow:0 1px 2px rgba(70,55,25,.05), 0 6px 18px rgba(70,55,25,.06);
+    --radius:18px;
+    --serif:'Noto Serif KR','Nanum Myeongjo',Georgia,serif;
   }
-  :root:not([data-theme="light"]) { }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#11151c; --card:#181d26; --border:#262c38; --border-strong:#333b49;
-      --text:#e7ebf2; --text-dim:#a2acbd; --text-faint:#6b7686;
-      --accent:#5b8def; --accent-dim:#1c2a44; --accent-strong:#82aefb;
-      --danger:#f4577c; --danger-dim:#3a1620;
-      --green:#3ddba0; --green-dim:#123328;
-      --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+      --bg:#1A1F26; --card:#222831; --soft:#2B333E; --hover:#343D4A;
+      --border:#303741; --border-strong:#39424D;
+      --text:#EDEAE1; --text-dim:#A6AFB9; --text-faint:#6E7680;
+      --accent:#7C9ED4; --accent-dim:#26344A; --accent-strong:#96B2DF; --on-accent:#14202F;
+      --danger:#DE6E62; --danger-dim:#3A2422;
+      --green:#64A79A; --green-dim:#1F3330;
+      --blue:#6EA0E3; --amber:#D0A05E; --amber-dim:#33291A;
+      --edu:#B79AD0;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.3);
     }
   }
   :root[data-theme="dark"]{
-    --bg:#11151c; --card:#181d26; --border:#262c38; --border-strong:#333b49;
-    --text:#e7ebf2; --text-dim:#a2acbd; --text-faint:#6b7686;
-    --accent:#5b8def; --accent-dim:#1c2a44; --accent-strong:#82aefb;
-    --danger:#f4577c; --danger-dim:#3a1620;
-    --green:#3ddba0; --green-dim:#123328;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+    --bg:#1A1F26; --card:#222831; --soft:#2B333E; --hover:#343D4A;
+    --border:#303741; --border-strong:#39424D;
+    --text:#EDEAE1; --text-dim:#A6AFB9; --text-faint:#6E7680;
+    --accent:#7C9ED4; --accent-dim:#26344A; --accent-strong:#96B2DF; --on-accent:#14202F;
+    --danger:#DE6E62; --danger-dim:#3A2422;
+    --green:#64A79A; --green-dim:#1F3330;
+    --blue:#6EA0E3; --amber:#D0A05E; --amber-dim:#33291A;
+    --edu:#B79AD0;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.3);
   }
   *{box-sizing:border-box;}
   html{overflow-x:hidden;}
   body{
     margin:0; background:var(--bg); color:var(--text);
     font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-    padding:28px 20px 80px; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    padding:26px 20px 80px; overflow-x:hidden;
   }
-  .wrap{max-width:1320px; margin:0 auto; min-width:0;}
-  .eyebrow{
-    text-align:center; letter-spacing:.22em; font-size:11px; font-weight:700;
-    color:var(--text-faint); margin-bottom:10px; text-transform:uppercase;
+  .wrap{max-width:1240px; margin:0 auto; min-width:0;}
+
+  /* ---- 상단 브랜드 영역 ---- */
+  .titlebar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid var(--border-strong);
   }
-  .eyebrow::before, .eyebrow::after{content:"—— "; }
-  .titlebar{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
-  .titlebar h1{font-size:30px; margin:0 0 6px; font-weight:900; text-align:center; width:100%;}
-  .titlebar p.sub{margin:0; color:var(--text-dim); font-size:14px; text-align:center; width:100%;}
-  .actions-top{ display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap;}
+  .brand{display:flex; align-items:center; gap:14px; min-width:0;}
+  .brand-mark{
+    width:50px; height:50px; border-radius:16px; flex:none; background:var(--card);
+    border:1px solid var(--border-strong); box-shadow:var(--shadow);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .eyebrow{ letter-spacing:.18em; font-size:10.5px; font-weight:700; color:var(--text-faint); text-transform:uppercase; margin-bottom:3px; }
+  .titlebar h1{font-family:var(--serif); font-size:24px; margin:0 0 3px; font-weight:700; line-height:1.25;}
+  .titlebar p.sub{margin:0; color:var(--text-faint); font-size:12.5px;}
+  .actions-top{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; align-items:center;}
+
   .btn{
     appearance:none; border:1px solid var(--border-strong); background:var(--card); color:var(--text);
-    padding:9px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer;
+    padding:8px 15px; border-radius:999px; font-size:12.5px; font-weight:600; font-family:inherit; cursor:pointer;
     display:inline-flex; align-items:center; gap:6px; transition:.15s; white-space:nowrap;
   }
-  .btn:hover{border-color:var(--accent); color:var(--accent);}
-  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
-  .btn.primary:hover{background:var(--accent-strong); color:#fff;}
-  .btn.danger{color:var(--danger); border-color:var(--danger-dim);}
-  .btn.danger:hover{border-color:var(--danger);}
-  .btn.dark{background:#1a1f28; color:#fff; border-color:#1a1f28;}
-  .btn.small{padding:5px 10px; font-size:12px; border-radius:8px;}
+  .btn:hover{background:var(--soft); border-color:var(--accent); color:var(--accent);}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+  .btn.primary:hover{background:var(--accent-strong); border-color:var(--accent-strong); color:var(--on-accent);}
+  .btn.danger{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 35%, var(--border-strong));}
+  .btn.danger:hover{background:var(--danger-dim); border-color:var(--danger); color:var(--danger);}
+  .btn.dark{background:var(--accent); color:var(--on-accent); border-color:var(--accent);}
+  .btn.dark:hover{background:var(--accent-strong); color:var(--on-accent);}
+  .btn.small{padding:5px 12px; font-size:12px;}
+  .btn.icon{width:36px; height:36px; padding:0; justify-content:center; font-size:15px;}
 
-  .card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow);}
+  .card{ background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); box-shadow:var(--shadow);}
+
+  /* ---- 연결 상태 배너 ---- */
   .banner{
-    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
-    padding:16px 20px; margin:22px 0;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    padding:12px 18px; margin:0 0 14px; background:var(--soft); box-shadow:none;
   }
-  .banner .left{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .banner .left{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .banner .badge{
-    background:var(--green-dim); color:var(--green); font-weight:700; font-size:12px;
-    padding:4px 10px; border-radius:999px; border:1px solid var(--green); border-color:color-mix(in srgb, var(--green) 40%, transparent);
+    background:var(--green-dim); color:var(--green); font-weight:600; font-size:11.5px;
+    padding:4px 11px; border-radius:999px; border:1px solid color-mix(in srgb, var(--green) 35%, transparent);
   }
-  .banner .note{font-size:13px; color:var(--text-dim);}
-  .banner .stats{display:flex; gap:22px; font-size:13px; color:var(--text-dim); align-items:center;}
-  .banner .stats b{color:var(--text); font-size:16px;}
+  .banner .note{font-size:12.5px; color:var(--text-dim);}
+  .banner .stats{display:flex; gap:20px; font-size:12.5px; color:var(--text-dim); align-items:center;}
+  .banner .stats b{color:var(--text); font-size:16px; font-family:var(--serif);}
+
+  /* ---- 오늘 · 날씨 · 공휴일 · 위치 요약 ---- */
+  .info-strip{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:10px 14px; margin-bottom:16px; }
+  .strip-main{ background:var(--accent-dim); border-color:transparent; color:var(--accent); font-weight:700; }
+  .strip-chip{
+    font-family:inherit; font-size:12px; font-weight:600; padding:6px 13px; border-radius:999px;
+    background:var(--soft); border:1px solid var(--border); color:var(--text-dim); white-space:nowrap;
+  }
+  button.strip-chip{cursor:pointer;}
+  button.strip-chip:hover{border-color:var(--accent); color:var(--accent);}
+  .strip-chip.hol{ color:var(--danger); background:var(--danger-dim); border-color:color-mix(in srgb, var(--danger) 28%, transparent); }
+  .strip-chip.wx{ color:var(--accent); background:var(--accent-dim); border-color:transparent; }
 
   .infobox{ padding:18px 22px; margin-bottom:22px; }
   .infobox-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:4px;}
   .infobox-head h2{font-size:16px; margin:0; display:flex; align-items:center; gap:8px;}
   .infobox p{margin:6px 0 0; font-size:13px; color:var(--text-dim);}
 
-  .tabbar{ display:flex; gap:6px; padding:6px; border-radius:14px; background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow); overflow-x:auto; margin-bottom:16px;}
+  /* ---- 탭(보기 전환) ---- */
+  .tabbar{ display:flex; gap:4px; padding:4px; border-radius:999px; background:var(--card); border:1px solid var(--border-strong); overflow-x:auto; margin-bottom:14px; width:fit-content; max-width:100%;}
   .tabbar button{
-    flex:1; min-width:150px; border:none; background:transparent; color:var(--text-dim); font-weight:700; font-size:13px;
-    padding:11px 10px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap;
+    flex:none; min-width:0; border:none; background:transparent; color:var(--text-dim); font-family:inherit; font-weight:600; font-size:12.5px;
+    padding:8px 16px; border-radius:999px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; transition:.15s;
   }
-  .tabbar button.active{background:#1a1f28; color:#fff;}
+  .tabbar button:hover{color:var(--text);}
+  .tabbar button.active{background:var(--accent); color:var(--on-accent);}
 
+  /* ---- 필터 ---- */
   .filterbar{
-    display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:14px 16px; margin-bottom:18px;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:12px 14px; margin-bottom:16px; box-shadow:none;
   }
-  .group{display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:10px; border:1px solid var(--border);}
+  .group{display:flex; gap:2px; background:var(--soft); padding:3px; border-radius:999px; border:1px solid var(--border);}
   .group button{
-    border:none; background:transparent; padding:7px 12px; border-radius:7px; font-size:12.5px; font-weight:700; color:var(--text-dim); cursor:pointer;
+    border:none; background:transparent; padding:6px 13px; border-radius:999px; font-family:inherit; font-size:12px; font-weight:600; color:var(--text-dim); cursor:pointer;
   }
-  .group button.active{background:#1a1f28; color:#fff;}
+  .group button.active{background:var(--accent); color:var(--on-accent);}
   .filterbar select, .filterbar input[type=text]{
-    border:1px solid var(--border-strong); background:var(--card); color:var(--text); border-radius:9px; padding:8px 10px; font-size:13px; font-family:inherit; font-weight:600;
+    border:1px solid var(--border-strong); background:var(--card); color:var(--text); border-radius:999px; padding:7px 13px; font-size:12.5px; font-family:inherit; font-weight:500;
   }
+  .filterbar select:focus, .filterbar input[type=text]:focus{outline:none; border-color:var(--accent);}
   #yearFilter, #monthFilter{ min-width:104px; }
   .filterbar input[type=text]{min-width:220px; flex:1;}
   .filterbar .spacer{flex:1;}
-  .result-chip{font-size:12.5px; color:var(--text-dim); white-space:nowrap;}
+  .result-chip{font-size:12px; color:var(--text-dim); white-space:nowrap;}
   .result-chip b{color:var(--text);}
 
-  /* ---- Table view ---- */
+  /* ---- 표 보기 ---- */
   table{width:100%; border-collapse:collapse; font-size:13.5px;}
   thead th{
-    text-align:left; padding:10px 12px; background:var(--bg); color:var(--text-dim); font-size:12px;
+    text-align:left; padding:11px 12px; background:var(--soft); color:var(--text-dim); font-size:11.5px; font-weight:600; letter-spacing:.02em;
     border-bottom:1px solid var(--border-strong); position:sticky; top:0; white-space:nowrap;
   }
-  tbody td{padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle;}
-  tbody tr:hover{background:color-mix(in srgb, var(--accent) 5%, transparent);}
-  .daycell{font-weight:700;}
-  .daycell .wd{font-weight:500; color:var(--text-dim); font-size:12px; margin-left:4px;}
-  .sess{ display:inline-block; padding:3px 9px; border-radius:7px; font-size:11.5px; font-weight:700;}
+  tbody td{padding:11px 12px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--hover);}
+  .daycell{font-weight:700; font-family:var(--serif);}
+  .daycell .wd{font-family:'Noto Sans KR',sans-serif; font-weight:500; color:var(--text-dim); font-size:12px; margin-left:4px;}
+  .hol-tag{ display:inline-block; font-family:'Noto Sans KR',sans-serif; font-size:10.5px; font-weight:700; color:var(--danger); background:var(--danger-dim); padding:1px 8px; border-radius:999px; margin-left:6px; white-space:nowrap; }
+  .wx-inline{ font-family:'Noto Sans KR',sans-serif; font-size:11.5px; font-weight:500; color:var(--text-dim); margin-left:6px; white-space:nowrap; }
+  .sess{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; white-space:nowrap;}
   .sess.am{background:var(--accent-dim); color:var(--accent);}
-  .sess.pm{background:#fff2df; color:#b45309;}
-  :root[data-theme="dark"] .sess.pm, @media (prefers-color-scheme: dark){ .sess.pm{background:#3a2a12; color:#f2b25c;} }
-  .roomtag{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap;}
+  .sess.pm{background:var(--amber-dim); color:var(--amber);}
+  .roomtag{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap;}
   .roomdot{width:8px; height:8px; border-radius:50%; flex:none;}
   .org{font-weight:600;}
-  .count{font-weight:800; white-space:nowrap;}
+  .count{font-weight:700; white-space:nowrap;}
   .count::before{content:"👥 "; font-size:11px;}
   .note{color:var(--text-dim); font-size:12.5px;}
   .rowops{display:flex; gap:6px;}
   .empty-row td{text-align:center; padding:40px; color:var(--text-faint);}
 
-  /* ---- calendar ---- */
-  .cal-head{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px;}
-  .cal-head h3{margin:0; font-size:20px; font-weight:900;}
-  .cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; width:100%;}
-  .cal-dow{text-align:center; font-size:12px; font-weight:700; color:var(--text-dim); padding-bottom:4px; min-width:0;}
-  .cal-dow.sun{color:var(--danger);} .cal-dow.sat{color:var(--accent);}
-  .cal-day{
-    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; min-height:118px;
-    display:flex; flex-direction:column; gap:5px; cursor:pointer; transition:.12s; min-width:0; overflow:hidden;
+  /* ---- 월간 캘린더 ---- */
+  .cal-head{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px;}
+  .cal-head h3{margin:0; min-width:150px; display:flex; align-items:baseline; justify-content:center; gap:8px;}
+  .cal-m{font-family:var(--serif); font-size:30px; font-weight:700; line-height:1;}
+  .cal-y{font-family:var(--serif); font-size:16px; color:var(--text-dim);}
+  .cal-head .btn.small{width:34px; height:34px; padding:0; justify-content:center; font-size:16px;}
+  .cal-head #calToday{width:auto; padding:0 15px; font-size:12px;}
+  .cal-grid{
+    display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:0; width:100%;
+    border:1px solid var(--border-strong); border-radius:16px; overflow:hidden; background:var(--card);
   }
-  .cal-day:hover{border-color:var(--accent); box-shadow:var(--shadow);}
-  .cal-day.empty{background:transparent; border:none; cursor:default;}
-  .cal-day .dnum{display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:13px; min-width:0; gap:4px;}
-  .cal-day .dnum span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .cal-day .dnum.sun{color:var(--danger);} .cal-day .dnum.sat{color:var(--accent);}
-  .cal-count{ font-size:10.5px; font-weight:800; background:#1a1f28; color:#fff; border-radius:999px; padding:1px 7px; flex:none; white-space:nowrap;}
-  .cal-item{ font-size:10.5px; padding:2px 6px; border-radius:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; min-width:0;}
+  .cal-dow{text-align:center; font-size:12px; font-weight:600; color:var(--text-dim); padding:10px 0; min-width:0; background:var(--soft); border-bottom:1px solid var(--border);}
+  .cal-dow.sun{color:var(--danger);} .cal-dow.sat{color:var(--blue);}
+  .cal-day{
+    background:var(--card); border:none; border-right:1px solid var(--border); border-bottom:1px solid var(--border); border-radius:0;
+    padding:7px 7px 6px; min-height:116px; display:flex; flex-direction:column; gap:4px; cursor:pointer; transition:background .12s; min-width:0; overflow:hidden;
+  }
+  .cal-grid > :nth-child(7n){border-right:none;}
+  .cal-day:hover{background:var(--hover);}
+  .cal-day.empty{background:color-mix(in srgb, var(--soft) 60%, transparent); cursor:default;}
+  .cal-day.empty:hover{background:color-mix(in srgb, var(--soft) 60%, transparent);}
+  .cal-day .dnum{display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:13px; min-width:0; gap:4px;}
+  .cal-day .dn-left{display:flex; align-items:center; gap:4px; min-width:0; white-space:nowrap; overflow:hidden;}
+  .cal-day .dn{flex:none; font-family:var(--serif); font-size:13.5px; line-height:1; display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px;}
+  .cal-day .dn.is-today{background:var(--accent); color:var(--on-accent); border-radius:50%; font-weight:700; box-shadow:var(--shadow);}
+  .cal-day .today-tag{font-size:10px; font-weight:700; color:var(--accent); background:var(--accent-dim); border-radius:5px; padding:2px 5px; line-height:1;}
+  .cal-day .dnum.sun{color:var(--danger);} .cal-day .dnum.sat{color:var(--blue);}
+  .cal-day .dn.is-today{color:var(--on-accent);}
+  .cal-wx{font-size:10.5px; font-weight:500; color:var(--text-faint); display:inline-flex; align-items:center; gap:1px;}
+  .cal-wx i{font-style:normal;}
+  .cal-hol{font-size:10.5px; font-weight:700; color:var(--danger); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cal-count{ font-size:10.5px; font-weight:700; background:var(--accent); color:var(--on-accent); border-radius:999px; padding:1px 7px; flex:none; white-space:nowrap;}
+  .cal-item{ font-size:10.5px; padding:2px 6px; border-radius:5px; border-left:2.5px solid currentColor; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; min-width:0;}
   .cal-more{ font-size:10px; color:var(--text-faint); text-align:center; margin-top:2px;}
-  .cal-empty-label{font-size:11px; color:var(--text-faint); text-align:center; margin-top:auto; margin-bottom:auto;}
+  .cal-empty-label{font-size:11px; color:var(--text-faint); text-align:center; margin-top:auto; margin-bottom:auto; opacity:.7;}
 
-  /* ---- rooms view ---- */
+  /* ---- 프로그램실별 ---- */
   .room-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; margin-bottom:26px;}
-  .room-card{padding:16px; cursor:pointer; transition:.12s; border:1px solid var(--border);}
+  .room-card{padding:16px; cursor:pointer; transition:.12s;}
   .room-card:hover{border-color:var(--accent); transform:translateY(-1px);}
   .room-card.selected{outline:2px solid var(--accent); outline-offset:-1px;}
   .room-card .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
-  .room-card .name{font-weight:800; font-size:15px; margin:4px 0 2px;}
+  .room-card .name{font-family:var(--serif); font-weight:700; font-size:15px; margin:4px 0 2px;}
   .room-card .desc{font-size:11.5px; color:var(--text-dim); min-height:30px;}
-  .room-card .num{font-size:24px; font-weight:900; margin-top:8px;}
-  .room-card .num span{font-size:12px; font-weight:600; color:var(--text-dim);}
+  .room-card .num{font-family:var(--serif); font-size:26px; font-weight:700; margin-top:8px;}
+  .room-card .num span{font-family:'Noto Sans KR',sans-serif; font-size:12px; font-weight:500; color:var(--text-dim);}
 
-  /* ---- print view ---- */
+  /* ---- 인쇄용 서식 ---- */
   .print-area{padding:26px;}
-  .print-area h2{text-align:center; font-size:24px; margin:6px 0 2px;}
+  .print-area h2{font-family:var(--serif); text-align:center; font-size:24px; margin:6px 0 2px;}
   .print-area .p-sub{text-align:center; color:var(--text-dim); font-size:13px; margin-bottom:18px;}
   .print-cols{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
   .p-month{margin-bottom:16px;}
-  .p-month h4{font-size:14px; border-bottom:2px solid #1a1f28; padding-bottom:6px; margin-bottom:8px;}
-  .p-date{font-weight:800; font-size:13px; margin-top:10px; display:flex; justify-content:space-between;}
+  .p-month h4{font-family:var(--serif); font-size:14px; border-bottom:2px solid var(--accent); padding-bottom:6px; margin-bottom:8px;}
+  .p-date{font-weight:700; font-size:13px; margin-top:10px; display:flex; justify-content:space-between;}
   .p-line{font-size:12px; color:var(--text-dim); padding-left:10px; display:flex; justify-content:space-between; gap:8px;}
   .p-line b{color:var(--text); font-weight:700;}
 
-  /* ---- modal ---- */
-  .overlay{ position:fixed; inset:0; background:rgba(10,14,20,.5); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  /* ---- 팝업(모달) ---- */
+  .overlay{ position:fixed; inset:0; background:rgba(20,24,30,.55); backdrop-filter:blur(2px); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
   .overlay.show{display:flex;}
-  .modal{ background:var(--card); border-radius:16px; width:100%; max-width:460px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.3); max-height:90vh; overflow:auto;}
-  .modal h3{margin:0 0 16px; font-size:17px;}
+  .modal{ background:var(--card); border:1px solid var(--border-strong); border-radius:22px; width:100%; max-width:460px; padding:22px 22px 20px; box-shadow:0 24px 70px rgba(0,0,0,.32); max-height:90vh; overflow:auto;}
+  .modal h3{font-family:var(--serif); margin:0 0 14px; font-size:18px; font-weight:700;}
   .field{margin-bottom:12px;}
-  .field label{display:block; font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:5px;}
+  .field label{display:block; font-size:12px; font-weight:600; color:var(--text-dim); margin-bottom:5px;}
   .field input, .field select, .field textarea{
-    width:100%; border:1px solid var(--border-strong); background:var(--bg); color:var(--text); border-radius:9px;
-    padding:9px 11px; font-size:13.5px; font-family:inherit;
+    width:100%; border:1px solid var(--border-strong); background:var(--soft); color:var(--text); border-radius:12px;
+    padding:9px 12px; font-size:13.5px; font-family:inherit;
   }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--accent); background:var(--card);}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .modal-ops{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
 
   .daymodal-list{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
-  .daymodal-item{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:12.5px;}
+  .daymodal-item{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); background:var(--soft); border-radius:12px; padding:9px 11px; font-size:12.5px;}
   .daymodal-item .grow{flex:1;}
   .daymodal-item .grow b{display:block; font-size:13px;}
+  .day-meta{display:flex; flex-wrap:wrap; gap:6px; margin:-6px 0 14px;}
+  .day-meta span{font-size:11.5px; font-weight:600; color:var(--text-dim); background:var(--soft); border:1px solid var(--border); border-radius:999px; padding:3px 10px;}
+  .day-meta span.meta-hol{color:var(--danger); background:var(--danger-dim); border-color:color-mix(in srgb, var(--danger) 28%, transparent);}
 
-  footer{ text-align:center; margin-top:30px; color:var(--text-faint); font-size:12px; padding-top:18px; border-top:1px solid var(--border);}
+  /* ---- 위치(지도) 팝업 ---- */
+  #locMap{ width:100%; height:220px; border-radius:14px; overflow:hidden; border:1px solid var(--border-strong); background:var(--soft); display:flex; align-items:center; justify-content:center; color:var(--text-faint); font-size:12px; text-align:center; padding:12px; margin:10px 0 12px;}
+  .loc-name{font-family:var(--serif); font-size:16px; font-weight:700;}
+  .loc-addr{font-size:12.5px; color:var(--text-dim); margin-top:2px;}
+  .loc-results{margin-top:8px; border:1px solid var(--border-strong); border-radius:12px; overflow:hidden; background:var(--card);}
+  .loc-results button{display:block; width:100%; text-align:left; border:none; border-bottom:1px solid var(--border); background:transparent; color:var(--text); padding:9px 12px; font-family:inherit; cursor:pointer;}
+  .loc-results button:last-child{border-bottom:none;}
+  .loc-results button:hover{background:var(--hover);}
+  .loc-results b{display:block; font-size:12.5px;}
+  .loc-results span{font-size:11.5px; color:var(--text-faint);}
+  #locMap.has-map{display:block; padding:0;}
+  .loc-msg{font-size:11.5px; color:var(--text-faint); margin:8px 2px 0; line-height:1.5;}
+
+  footer{ text-align:center; margin-top:30px; color:var(--text-faint); font-size:12px; padding-top:18px; border-top:1px solid var(--border-strong);}
 
   @media print{
+    :root, :root[data-theme="dark"]{ --bg:#fff; --card:#fff; --soft:#fff; --hover:#fff; --border:#ddd; --border-strong:#bbb; --text:#111; --text-dim:#444; --text-faint:#666; --accent:#1f3550; --on-accent:#fff; --danger:#b24638; --shadow:none; }
+    body{background:#fff !important; color:#111 !important; padding:0;}
     body *{visibility:hidden;}
     #printSheet, #printSheet *{visibility:visible;}
     #printSheet{position:absolute; left:0; top:0; width:100%;}
     .no-print{display:none !important;}
   }
   @media (max-width: 720px){
+    body{padding:18px 12px 70px;}
     .print-cols{grid-template-columns:1fr;}
     table{font-size:12px;}
-    .titlebar h1{font-size:22px;}
+    .titlebar h1{font-size:19px;}
+    .brand-mark{width:42px; height:42px; border-radius:13px;}
+    .actions-top{justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; width:100%; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+    .actions-top .btn{flex:none;}
+    .tabbar{width:100%;}
+    .tabbar button{padding:8px 13px;}
+    .info-strip{padding:8px 10px; gap:6px;}
+    .strip-chip{font-size:11.5px; padding:5px 10px; white-space:normal;}
 
     /* 정규 일정표를 카드형으로 전환 (가로 스크롤 대신 세로 카드) */
     #view-table table thead{ display:none; }
     #view-table table, #view-table tbody, #view-table tr{ display:block; width:100%; }
     #view-table tbody tr{
-      border:1px solid var(--border); border-radius:14px; margin:0 0 10px; padding:10px 12px;
+      border:1px solid var(--border-strong); border-radius:16px; margin:0 0 10px; padding:10px 12px;
       background:var(--card); box-shadow:var(--shadow);
     }
     #view-table tbody td{
@@ -222,28 +310,32 @@
     #view-table tbody td[data-label]:not([data-label=""])::before{
       content:attr(data-label); font-size:11px; font-weight:700; color:var(--text-faint); flex:none;
     }
-    #view-table tbody td[data-label="일자"]{ font-size:14px; border-bottom:1px dashed var(--border); padding-bottom:8px; margin-bottom:2px; }
+    #view-table tbody td[data-label="일자"]{ font-size:14px; border-bottom:1px dashed var(--border-strong); padding-bottom:8px; margin-bottom:2px; flex-wrap:wrap; justify-content:flex-start; }
     #view-table tbody td .rowops{ width:100%; justify-content:flex-end; }
 
     /* 캘린더를 모바일 화면 폭에 맞게 압축 */
     #view-calendar{ padding:12px 8px !important; }
-    .cal-grid{ gap:4px; }
-    .cal-day{ min-height:64px; padding:4px; border-radius:8px; gap:2px; }
+    .cal-day{ min-height:66px; padding:3px; gap:2px; }
     .cal-day .dnum{ font-size:11px; }
+    .cal-day .dn{ font-size:11px; min-width:18px; height:18px; }
+    .cal-day .today-tag{ display:none; }
+    .cal-wx{ font-size:9px; }
+    .cal-wx i{ display:none; }
+    .cal-day .dnum{ flex-wrap:wrap; row-gap:2px; }
+    .cal-hol{ font-size:8.5px; }
     .cal-count{ font-size:8.5px; padding:1px 4px; }
-    .cal-item{ font-size:8.5px; padding:1px 3px; border-radius:4px; }
+    .cal-item{ font-size:8.5px; padding:1px 3px; border-radius:4px; border-left-width:2px; }
     .cal-more, .cal-empty-label{ font-size:8.5px; }
-    .cal-dow{ font-size:10px; }
-    .cal-head h3{ font-size:16px; }
+    .cal-dow{ font-size:10px; padding:7px 0; }
+    .cal-m{ font-size:24px; }
+    .cal-y{ font-size:13px; }
   }
 
   /* ===== 에듀 스케줄러(수업 시간표) 연동 표시 — 읽기 전용 ===== */
-  :root{ --edu:#4f46e5; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --edu:#a5b4fc; } }
   .cal-item.edu{ background:color-mix(in srgb, var(--edu) 14%, transparent); color:var(--edu); }
   .edu-section{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border-strong); }
   .edu-section h4{ margin:0 0 8px; font-size:12.5px; color:var(--edu); }
-  .edu-item{ display:flex; gap:8px; align-items:flex-start; border:1px solid color-mix(in srgb, var(--edu) 35%, transparent); background:color-mix(in srgb, var(--edu) 10%, transparent); border-radius:10px; padding:8px 10px; font-size:12.5px; margin-bottom:6px; }
+  .edu-item{ display:flex; gap:8px; align-items:flex-start; border:1px solid color-mix(in srgb, var(--edu) 35%, transparent); background:color-mix(in srgb, var(--edu) 10%, transparent); border-radius:12px; padding:8px 11px; font-size:12.5px; margin-bottom:6px; }
   .edu-item .t{ font-weight:800; white-space:nowrap; color:var(--edu); }
   .edu-item .grow{ flex:1; min-width:0; }
   .edu-item .grow b{ display:block; font-size:13px; }
@@ -252,11 +344,19 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">GANGNEUNG BRANCH REGULAR PROGRAM SCHEDULE</div>
   <div class="titlebar">
-    <h1>강릉분원 정규 프로그램 일정표</h1>
-    <p class="sub">정규 체험실습 및 장애이해·직업체험 프로그램 종합 일정 안내 (편집 가능 · 업무용)</p>
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="32" height="32"><path d="M4 27 L14 11 L21 21 L26 14 L36 27 Z" fill="var(--accent)"/><path d="M3 32 q4 -3 8 0 t8 0 t8 0 t8 0" stroke="var(--blue)" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="eyebrow">Gangneung Branch · Regular Program</div>
+        <h1>강릉분원 정규 프로그램 일정표</h1>
+        <p class="sub">정규 체험실습 및 장애이해·직업체험 프로그램 종합 일정 안내 (편집 가능 · 업무용)</p>
+      </div>
+    </div>
     <div class="actions-top no-print">
+      <button class="btn icon" id="btnTheme" title="라이트/다크 모드 전환">🌙</button>
       <button class="btn primary" id="btnAdd">＋ 일정 추가</button>
       <button class="btn" id="btnPrintTop">🖨 인쇄 / PDF</button>
       <button class="btn" id="btnExportCsv">📥 CSV 다운로드</button>
@@ -281,9 +381,12 @@
     </div>
   </div>
 
-  <div class="card no-print" id="todayStrip" style="display:flex; gap:10px; flex-wrap:wrap; padding:12px 16px; margin-bottom:18px;">
-    <button class="btn small" id="todayCard" style="background:var(--accent-dim); border-color:transparent; color:var(--accent); font-weight:800;"></button>
-    <span class="btn small" id="weekCard" style="background:var(--bg); cursor:default; font-weight:800;"></span>
+  <div class="card no-print info-strip" id="todayStrip">
+    <button class="btn small strip-main" id="todayCard"></button>
+    <span class="strip-chip" id="weekCard"></span>
+    <button class="strip-chip wx" id="wxCard" title="위치·날씨 기준 설정"></button>
+    <span class="strip-chip hol" id="holCard" style="display:none;"></span>
+    <button class="strip-chip" id="locBtn" title="강릉분원 위치 보기 / 설정"></button>
   </div>
 
   <div class="tabbar no-print">
@@ -327,11 +430,12 @@
   </div>
 
   <!-- CALENDAR VIEW -->
-  <div class="card" id="view-calendar" style="display:none; padding:22px;">
+  <div class="card" id="view-calendar" style="display:none; padding:18px;">
     <div class="cal-head">
-      <button class="btn small" id="calPrev">‹</button>
-      <h3 id="calTitle">2026년 9월</h3>
-      <button class="btn small" id="calNext">›</button>
+      <button class="btn small" id="calToday" title="이번 달로 이동">오늘</button>
+      <button class="btn small" id="calPrev" aria-label="이전 달">‹</button>
+      <h3 id="calTitle"><span class="cal-m">9월</span><span class="cal-y">2026년</span></h3>
+      <button class="btn small" id="calNext" aria-label="다음 달">›</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
@@ -444,10 +548,33 @@
   </div>
 </div>
 
+<!-- LOCATION MODAL (강릉분원 위치 · 날씨 기준점) -->
+<div class="overlay" id="locOverlay">
+  <div class="modal" style="max-width:520px;">
+    <h3>📍 강릉분원 위치</h3>
+    <div id="locSummary"></div>
+    <div id="locMap">지도</div>
+    <a class="btn small" id="locKakaoLink" href="https://map.kakao.com" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">카카오맵에서 열기 ↗</a>
+    <div class="field" style="margin-top:14px;">
+      <label>장소·주소 검색 (선택한 곳이 날씨 예보 기준 위치가 됩니다)</label>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="locQuery" placeholder="예) 강릉분원 주소 또는 시설 이름" style="flex:1;">
+        <button type="button" class="btn small primary" id="btnLocSearch">검색</button>
+      </div>
+      <div id="locResults"></div>
+      <p class="loc-msg" id="locHint"></p>
+    </div>
+    <div class="modal-ops">
+      <button class="btn" id="btnCloseLoc">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- DAY DETAIL MODAL -->
 <div class="overlay" id="dayOverlay">
   <div class="modal" style="max-width:520px;">
     <h3 id="dayTitle">일정</h3>
+    <div class="day-meta" id="dayMeta"></div>
     <div class="field" style="margin-bottom:14px;">
       <label>📌 이 날짜 공지사항 (예: 업사이클링실 휴관, 시설 점검 등)</label>
       <div style="display:flex; gap:6px;">
@@ -1015,6 +1142,7 @@ async function initCollab(){
   });
   if(collabBackend === 'firebase'){
     try{ subscribeEduDb(); }catch(e){ console.warn('edu link subscribe failed', e); setEduBadge('error','net'); }
+    try{ subscribeLocationDb(); }catch(e){ console.warn('location subscribe failed', e); }
   }else{
     setEduBadge('off');
   }
@@ -1495,6 +1623,302 @@ function jumpCalendarToFilter(){
   }
 }
 
+/* ================= 날씨 · 공휴일 · 위치 · 테마 =================
+   교회 캘린더와 같은 방식입니다.
+   - 날씨: Open-Meteo (무료, API 키 필요 없음)
+   - 공휴일: Nager.Date (무료, API 키 필요 없음)
+   - 위치 검색·지도: 카카오맵 JavaScript 키 (카카오 개발자 콘솔 → 플랫폼 → Web 에 이 사이트 주소가 등록돼 있어야 합니다) */
+const KAKAO_APP_KEY = '12e556b010a34f4a8939e731a0c88861';
+const LOC_KEY = 'gnBranchLocationV1';
+const DEFAULT_LOC = { label:'강릉', address:'', lat:37.7519, lng:128.8761 }; // 강릉시 기준. 위치를 설정하면 그 위치로 바뀝니다.
+let branchLoc = { ...DEFAULT_LOC };
+try{
+  const savedLoc = JSON.parse(localStorage.getItem(LOC_KEY) || 'null');
+  if(savedLoc && isFinite(savedLoc.lat) && isFinite(savedLoc.lng)) branchLoc = { ...DEFAULT_LOC, ...savedLoc };
+}catch(e){}
+let weatherMap = {};   // 'YYYY-MM-DD' -> { tMax, tMin, code, pop }
+let holidayMap = {};   // 'YYYY-MM-DD' -> '개천절'
+let wxState = 'loading'; // 'loading' | 'ok' | 'fail'
+
+// WMO 날씨 코드 → 이모지 / 한글 설명
+function weatherEmoji(code){
+  if(code===0) return '☀️';
+  if(code===1 || code===2) return '🌤️';
+  if(code===3) return '☁️';
+  if(code===45 || code===48) return '🌫️';
+  if([51,53,55,56,57].includes(code)) return '🌦️';
+  if([61,63,65,66,67,80,81,82].includes(code)) return '🌧️';
+  if([71,73,75,77,85,86].includes(code)) return '❄️';
+  if([95,96,99].includes(code)) return '⛈️';
+  return '🌡️';
+}
+function weatherText(code){
+  if(code===0) return '맑음';
+  if(code===1) return '대체로 맑음';
+  if(code===2) return '구름 조금';
+  if(code===3) return '흐림';
+  if(code===45 || code===48) return '안개';
+  if([51,53,55,56,57].includes(code)) return '이슬비';
+  if([61,63,65,66,67].includes(code)) return '비';
+  if([80,81,82].includes(code)) return '소나기';
+  if([71,73,75,77].includes(code)) return '눈';
+  if([85,86].includes(code)) return '눈 소나기';
+  if([95,96,99].includes(code)) return '천둥번개';
+  return '날씨';
+}
+function wxTitle(w){
+  return `${weatherText(w.code)} · 최고 ${Math.round(w.tMax)}° / 최저 ${Math.round(w.tMin)}°` + (w.pop!=null ? ` · 강수확률 ${w.pop}%` : '');
+}
+function wxInline(date){
+  const w = weatherMap[date];
+  return w ? `<span class="wx-inline" title="${escapeHtml(wxTitle(w))}">${weatherEmoji(w.code)} ${Math.round(w.tMax)}°</span>` : '';
+}
+
+// 날씨/공휴일이 새로 도착하면 화면을 다시 그립니다.
+function afterExternalDataChange(){
+  try{ renderAll(); }catch(e){ console.error('re-render failed', e); }
+  try{ if(typeof dayOverlay!=='undefined' && dayOverlay.classList.contains('show')) renderDayMeta(); }catch(e){}
+}
+
+const WX_CACHE_KEY = 'gnWeatherCacheV1';
+let wxSeq = 0;
+async function loadWeather(){
+  const lat = branchLoc.lat, lng = branchLoc.lng;
+  const seq = ++wxSeq;
+  try{
+    const raw = localStorage.getItem(WX_CACHE_KEY);
+    if(raw){
+      const c = JSON.parse(raw);
+      if(c && c.data && Math.abs(c.lat-lat)<0.001 && Math.abs(c.lng-lng)<0.001 && Date.now()-c.at < 60*60*1000){
+        weatherMap = c.data; wxState = 'ok'; return;   // 1시간 이내 저장본이 있으면 그대로 사용
+      }
+    }
+  }catch(e){}
+  if(typeof fetch!=='function'){ wxState = 'fail'; return; }
+  wxState = 'loading';
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&past_days=7&forecast_days=16`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('weather fetch failed');
+    const j = await res.json();
+    if(seq !== wxSeq) return; // 그 사이 위치가 바뀌었으면 이 결과는 버립니다
+    const map = {};
+    const dd = j.daily || {};
+    (dd.time || []).forEach((d,i)=>{
+      const tMax = dd.temperature_2m_max ? dd.temperature_2m_max[i] : null;
+      const tMin = dd.temperature_2m_min ? dd.temperature_2m_min[i] : null;
+      if(tMax==null || tMin==null) return;
+      map[d] = { tMax, tMin, code: dd.weathercode ? dd.weathercode[i] : -1, pop: dd.precipitation_probability_max ? dd.precipitation_probability_max[i] : null };
+    });
+    weatherMap = map; wxState = 'ok';
+    try{ localStorage.setItem(WX_CACHE_KEY, JSON.stringify({ lat, lng, at:Date.now(), data:map })); }catch(e){}
+    afterExternalDataChange();
+  }catch(e){
+    console.warn('weather load failed', e);
+    if(seq === wxSeq){ wxState = 'fail'; afterExternalDataChange(); }
+  }
+}
+
+const holidayYears = new Set();
+const holidayFailAt = new Map();
+async function fetchHolidayYear(year){
+  const key = `gnHolidays-KR-${year}-v1`;
+  try{ const c = localStorage.getItem(key); if(c) return JSON.parse(c); }catch(e){}
+  if(typeof fetch!=='function') return null;
+  try{
+    const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/KR`);
+    if(!res.ok) throw new Error('holiday fetch failed');
+    const list = await res.json();
+    const map = {};
+    list.forEach(h=>{ map[h.date] = h.localName || h.name; });
+    try{ localStorage.setItem(key, JSON.stringify(map)); }catch(e){}
+    return map;
+  }catch(e){ return null; }
+}
+// 해당 연도와 앞뒤 연도의 공휴일을 한 번씩만 불러옵니다. (달력에 이전/다음 달이 걸쳐 보이므로)
+function ensureHolidays(year){
+  year = Number(year);
+  if(!year) return;
+  const now = Date.now();
+  const todo = [year-1, year, year+1].filter(y=>!holidayYears.has(y) && !(holidayFailAt.get(y) && now-holidayFailAt.get(y) < 60000));
+  if(!todo.length) return;
+  todo.forEach(y=>holidayYears.add(y));
+  Promise.all(todo.map(fetchHolidayYear)).then(results=>{
+    let changed = false;
+    results.forEach((m,i)=>{
+      if(m===null){ holidayYears.delete(todo[i]); holidayFailAt.set(todo[i], Date.now()); return; }  // 실패: 1분 뒤 다시 시도
+      Object.keys(m).forEach(k=>{ if(holidayMap[k]!==m[k]){ holidayMap[k] = m[k]; changed = true; } });
+    });
+    if(changed) afterExternalDataChange();
+  });
+}
+
+// ----- 위치 -----
+function applyLocation(loc, persist){
+  branchLoc = { ...DEFAULT_LOC, ...loc };
+  try{ localStorage.setItem(LOC_KEY, JSON.stringify(branchLoc)); }catch(e){}
+  if(persist && dbAvailable && collabBackend==='firebase'){
+    dbApi.collection('branchSettings').doc('location').set(branchLoc).catch(e=>console.warn('location save failed', e));
+  }
+  loadWeather().then(afterExternalDataChange);
+  renderLocModal();
+}
+function subscribeLocationDb(){
+  dbApi.collection('branchSettings').doc('location').onSnapshot(doc=>{
+    if(!doc.exists) return;
+    const d = doc.data() || {};
+    if(isFinite(d.lat) && isFinite(d.lng)){
+      const changed = Math.abs(Number(d.lat)-branchLoc.lat) > 0.0001 || Math.abs(Number(d.lng)-branchLoc.lng) > 0.0001 || d.label!==branchLoc.label;
+      if(changed) applyLocation({ label:d.label || DEFAULT_LOC.label, address:d.address || '', lat:Number(d.lat), lng:Number(d.lng) }, false);
+    }
+  }, err=>console.warn('location snapshot error', err));
+}
+
+let kakaoPromise = null;
+function loadKakao(){
+  if(!KAKAO_APP_KEY) return Promise.reject(new Error('kakao key missing'));
+  if(kakaoPromise) return kakaoPromise;
+  kakaoPromise = new Promise((resolve, reject)=>{
+    if(window.kakao && window.kakao.maps){ window.kakao.maps.load(()=>resolve(window.kakao)); return; }
+    const sc = document.createElement('script');
+    sc.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services&autoload=false`;
+    sc.async = true;
+    sc.onload = ()=>{ try{ window.kakao.maps.load(()=>resolve(window.kakao)); }catch(e){ kakaoPromise = null; reject(e); } };
+    sc.onerror = ()=>{ kakaoPromise = null; reject(new Error('kakao load failed')); };
+    document.head.appendChild(sc);
+  });
+  return kakaoPromise;
+}
+function kakaoMapLink(){
+  return `https://map.kakao.com/link/map/${encodeURIComponent(branchLoc.label)},${branchLoc.lat},${branchLoc.lng}`;
+}
+function renderLocModal(){
+  const sum = document.getElementById('locSummary');
+  if(sum) sum.innerHTML = `<div class="loc-name">${escapeHtml(branchLoc.label)}</div><div class="loc-addr">${branchLoc.address ? escapeHtml(branchLoc.address) : '아직 정확한 위치를 설정하지 않았습니다. 아래에서 검색해 설정하면 그 위치의 날씨가 표시됩니다. (지금은 강릉시 기준)'}</div>`;
+  const link = document.getElementById('locKakaoLink');
+  if(link) link.href = kakaoMapLink();
+  const origin = (typeof location!=='undefined' && location.origin) ? location.origin : 'https://fumon1218.github.io';
+  const hint = document.getElementById('locHint');
+  if(hint) hint.textContent = `검색이 안 되면 카카오 개발자 콘솔 → 앱 → 플랫폼 → Web 에 ${origin} 가 등록돼 있는지 확인해 주세요.`;
+}
+async function showLocMap(){
+  const box = document.getElementById('locMap');
+  box.classList.remove('has-map');
+  box.textContent = '지도를 불러오는 중...';
+  try{
+    const kakao = await loadKakao();
+    box.textContent = '';
+    box.classList.add('has-map');
+    const center = new kakao.maps.LatLng(branchLoc.lat, branchLoc.lng);
+    const map = new kakao.maps.Map(box, { center, level:4 });
+    new kakao.maps.Marker({ position:center, map });
+  }catch(e){
+    box.classList.remove('has-map');
+    box.textContent = '지도를 불러오지 못했습니다. 아래 "카카오맵에서 열기"를 이용해 주세요.';
+  }
+}
+function openLocModal(){
+  renderLocModal();
+  document.getElementById('locResults').innerHTML = '';
+  document.getElementById('locOverlay').classList.add('show');
+  showLocMap();
+}
+let locSearchResults = [];
+async function runLocSearch(){
+  const q = document.getElementById('locQuery').value.trim();
+  const box = document.getElementById('locResults');
+  if(!q) return;
+  box.innerHTML = '<div class="loc-msg">검색 중...</div>';
+  try{
+    const kakao = await loadKakao();
+    const ps = new kakao.maps.services.Places();
+    ps.keywordSearch(q, (data, status)=>{
+      if(status !== kakao.maps.services.Status.OK || !data || !data.length){ box.innerHTML = '<div class="loc-msg">검색 결과가 없습니다.</div>'; return; }
+      locSearchResults = data.slice(0, 6);
+      box.innerHTML = '<div class="loc-results">' + locSearchResults.map((r,i)=>
+        `<button type="button" data-i="${i}"><b>${escapeHtml(r.place_name)}</b><span>${escapeHtml(r.road_address_name || r.address_name || '')}</span></button>`
+      ).join('') + '</div>';
+    });
+  }catch(e){
+    box.innerHTML = '<div class="loc-msg">카카오맵을 불러오지 못해 검색할 수 없습니다. (도메인 등록 또는 키를 확인해 주세요)</div>';
+  }
+}
+document.getElementById('locResults').addEventListener('click', ev=>{
+  const b = ev.target.closest && ev.target.closest('button[data-i]');
+  if(!b) return;
+  const r = locSearchResults[Number(b.dataset.i)];
+  if(!r) return;
+  applyLocation({ label:r.place_name, address:r.road_address_name || r.address_name || '', lat:parseFloat(r.y), lng:parseFloat(r.x) }, true);
+  document.getElementById('locResults').innerHTML = '';
+  document.getElementById('locQuery').value = '';
+  showLocMap();
+});
+document.getElementById('btnLocSearch').onclick = runLocSearch;
+document.getElementById('locQuery').addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); runLocSearch(); } });
+document.getElementById('btnCloseLoc').onclick = ()=>document.getElementById('locOverlay').classList.remove('show');
+document.getElementById('wxCard').onclick = openLocModal;
+document.getElementById('locBtn').onclick = openLocModal;
+
+// ----- 오늘 요약 줄: 날씨 · 다음 공휴일 · 위치 -----
+function renderStripExtras(){
+  const t = todayStr();
+  const wxEl = document.getElementById('wxCard');
+  const w = weatherMap[t];
+  if(w){
+    wxEl.textContent = `${weatherEmoji(w.code)} ${branchLoc.label} 오늘 ${Math.round(w.tMax)}°/${Math.round(w.tMin)}° · ${weatherText(w.code)}${w.pop!=null ? ` · 강수 ${w.pop}%` : ''}`;
+  }else{
+    wxEl.textContent = wxState==='fail' ? '🌡️ 날씨 정보를 불러오지 못했습니다' : `🌡️ ${branchLoc.label} 날씨 불러오는 중...`;
+  }
+  const holEl = document.getElementById('holCard');
+  const next = Object.keys(holidayMap).sort().find(k=>k>=t);
+  if(next){
+    const diff = Math.round((dObj(next) - dObj(t)) / 86400000);
+    holEl.style.display = '';
+    holEl.textContent = diff===0 ? `🎌 오늘은 ${holidayMap[next]}` : `🎌 다음 공휴일 ${holidayMap[next]} ${fmtDate(next)}(${wd(next)}) · D-${diff}`;
+  }else{
+    holEl.style.display = 'none';
+  }
+  const locEl = document.getElementById('locBtn');
+  locEl.textContent = `📍 ${branchLoc.label}`;
+  locEl.title = branchLoc.address ? branchLoc.address : '강릉분원 위치 보기 / 설정';
+}
+
+// ----- 날짜 상세 팝업: 공휴일 · 날씨 · 위치 줄 -----
+function renderDayMeta(){
+  const box = document.getElementById('dayMeta');
+  if(!box) return;
+  const parts = [];
+  const hol = holidayMap[currentDay];
+  const w = weatherMap[currentDay];
+  if(hol) parts.push(`<span class="meta-hol">🎌 ${escapeHtml(hol)}</span>`);
+  if(w) parts.push(`<span>${weatherEmoji(w.code)} ${weatherText(w.code)} ${Math.round(w.tMax)}°/${Math.round(w.tMin)}°${w.pop!=null ? ` · 강수 ${w.pop}%` : ''}</span>`);
+  parts.push(`<span>📍 ${escapeHtml(branchLoc.label)}</span>`);
+  box.innerHTML = parts.join('');
+}
+
+// ----- 라이트/다크 테마 -----
+const THEME_KEY = 'gnThemeV1';
+function effectiveTheme(){
+  const a = document.documentElement.getAttribute('data-theme');
+  if(a==='dark' || a==='light') return a;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+function applyTheme(t){
+  if(t==='dark' || t==='light') document.documentElement.setAttribute('data-theme', t);
+  else document.documentElement.removeAttribute('data-theme');
+  const b = document.getElementById('btnTheme');
+  if(b){ b.textContent = effectiveTheme()==='dark' ? '☀️' : '🌙'; b.title = effectiveTheme()==='dark' ? '라이트 모드로 전환' : '다크 모드로 전환'; }
+}
+try{ applyTheme(localStorage.getItem(THEME_KEY)); }catch(e){ applyTheme(null); }
+document.getElementById('btnTheme').onclick = ()=>{
+  const next = effectiveTheme()==='dark' ? 'light' : 'dark';
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+  applyTheme(next);
+};
+
+// 시작할 때 날씨를 불러옵니다. (공휴일은 화면을 그릴 때 필요한 연도만 자동으로 불러옵니다)
+loadWeather();
+
 /* ================= RENDER: TABLE ================= */
 function weatherLinkFor(dateStr){
   const [y,m,d] = dateStr.split('-');
@@ -1503,7 +1927,10 @@ function weatherLinkFor(dateStr){
 }
 function weatherBadge(e){
   if(e.room!=='upcycle') return '';
-  return `<a href="${weatherLinkFor(e.date)}" target="_blank" rel="noopener noreferrer" title="강릉 날씨 확인 (새 창, 야외활동 실이라 날씨를 확인해보세요)" style="margin-left:6px; text-decoration:none; font-size:13px;" onclick="event.stopPropagation();">🌤️</a>`;
+  const w = weatherMap[e.date];
+  const label = w ? `${weatherEmoji(w.code)} ${Math.round(w.tMax)}°${w.pop!=null && w.pop>=40 ? ` ☔${w.pop}%` : ''}` : '🌤️';
+  const tip = w ? `${wxTitle(w)} — 야외활동 실입니다. 클릭하면 네이버 날씨(새 창)` : '강릉 날씨 확인 (새 창, 야외활동 실이라 날씨를 확인해보세요)';
+  return `<a href="${weatherLinkFor(e.date)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(tip)}" style="margin-left:6px; text-decoration:none; font-size:12.5px; font-weight:600; color:var(--text-dim);" onclick="event.stopPropagation();">${label}</a>`;
 }
 function renderTable(){
   const rows = filtered();
@@ -1512,7 +1939,7 @@ function renderTable(){
   body.innerHTML = rows.map(e=>{
     const r = roomOf(e.room);
     return `<tr data-id="${e.id}">
-      <td class="daycell" data-label="일자">${fmtDate(e.date)}<span class="wd">(${wd(e.date)})</span></td>
+      <td class="daycell" data-label="일자">${fmtDate(e.date)}<span class="wd">(${wd(e.date)})</span>${holidayMap[e.date]?`<span class="hol-tag">${escapeHtml(holidayMap[e.date])}</span>`:''}${wxInline(e.date)}</td>
       <td data-label="시간"><span class="sess ${e.session.toLowerCase()}">${e.session==='AM'?'오전':'오후'}</span></td>
       <td data-label="프로그램실"><span class="roomtag" style="background:color-mix(in srgb, ${r.color} 16%, transparent); color:${r.color};"><span class="roomdot" style="background:${r.color};"></span>${r.name}</span>${weatherBadge(e)}</td>
       <td data-label="구분/비고"><span class="org">${escapeHtml(e.org)}</span>${e.note?` <span class="note">· ${escapeHtml(e.note)}</span>`:''}</td>
@@ -1531,7 +1958,8 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<
 
 /* ================= RENDER: CALENDAR ================= */
 function renderCalendar(){
-  document.getElementById('calTitle').textContent = `${state.calYear}년 ${state.calMonth}월`;
+  ensureHolidays(state.calYear);
+  document.getElementById('calTitle').innerHTML = `<span class="cal-m">${state.calMonth}월</span><span class="cal-y">${state.calYear}년</span>`;
   const grid = document.getElementById('calGrid');
   const dowRow = WD.map((d,i)=>`<div class="cal-dow ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
   const first = new Date(state.calYear, state.calMonth-1, 1);
@@ -1560,8 +1988,12 @@ function renderCalendar(){
     const more = allDayEntries.length - shown.length;
     const note = dayNotes[dateStr];
     const hasUpcycle = allDayEntries.some(e=>e.room==='upcycle');
-    cells += `<div class="cal-day" onclick="openDay('${dateStr}')">
-      <div class="dnum ${dow===0?'sun':dow===6?'sat':''}"><span>${d}${hasUpcycle?' 🌤️':''}</span>${total?`<span class="cal-count">👥${total}</span>`:''}</div>
+    const hol = holidayMap[dateStr];
+    const wx = weatherMap[dateStr];
+    const isToday = dateStr===todayStr();
+    cells += `<div class="cal-day${isToday?' today':''}${hol?' holiday':''}" onclick="openDay('${dateStr}')">
+      <div class="dnum ${(dow===0||hol)?'sun':dow===6?'sat':''}"><span class="dn-left"><span class="dn${isToday?' is-today':''}">${d}</span>${isToday?'<span class="today-tag">오늘</span>':''}${wx?`<span class="cal-wx" title="${escapeHtml(wxTitle(wx))}">${weatherEmoji(wx.code)}<i>${Math.round(wx.tMax)}°</i></span>`:(hasUpcycle?'<span class="cal-wx">🌤️</span>':'')}</span>${total?`<span class="cal-count">👥${total}</span>`:''}</div>
+      ${hol?`<div class="cal-hol" title="${escapeHtml(hol)}">${escapeHtml(hol)}</div>`:''}
       ${note?`<div class="cal-item" style="background:#fde68a; color:#92400e; font-weight:800;" title="${escapeHtml(note)}">📌 ${escapeHtml(note)}</div>`:''}
       ${shown.map(e=>{const r=roomOf(e.room); return `<div class="cal-item" style="background:color-mix(in srgb, ${r.color} 18%, transparent); color:${r.color};">${escapeHtml(e.org)} ${e.count}명</div>`;}).join('')}
       ${more>0?`<div class="cal-more">+${more}건 더보기</div>`:''}
@@ -1569,9 +2001,16 @@ function renderCalendar(){
       ${allDayEntries.length===0 && !note && eduDay.length===0?`<div class="cal-empty-label">일정 없음</div>`:''}
     </div>`;
   }
+  const trailingBlank = (7 - ((startDow + daysInMonth) % 7)) % 7;
+  for(let i=0;i<trailingBlank;i++) cells += `<div class="cal-day empty"></div>`;
   grid.innerHTML = dowRow + cells;
 }
 
+document.getElementById('calToday').onclick=()=>{
+  const now = new Date();
+  state.calYear = now.getFullYear(); state.calMonth = now.getMonth()+1;
+  renderCalendar();
+};
 document.getElementById('calPrev').onclick=()=>{
   state.calMonth--; if(state.calMonth<9){ state.calMonth=12; state.calYear--; } // clamp-ish for this schedule range
   if(state.calMonth<1){state.calMonth=12; state.calYear--;}
@@ -1849,6 +2288,7 @@ function renderTodayStrip(){
   const weekList = entries.filter(e=>e.date>=start && e.date<=end);
   const weekCount = weekList.reduce((s,e)=>s+Number(e.count),0);
   document.getElementById('weekCard').textContent = `🗓 이번 주(${fmtDate(start)}~${fmtDate(end)}) 일정 ${weekList.length}건 · ${weekCount}명`;
+  renderStripExtras();
 }
 document.getElementById('todayCard').onclick = ()=>{ openDay(todayStr()); };
 
@@ -2000,6 +2440,7 @@ let currentDay = null;
 function openDay(dateStr){
   currentDay = dateStr;
   document.getElementById('dayTitle').textContent = `${fmtDate(dateStr)} (${wd(dateStr)}) 일정`;
+  renderDayMeta();
   document.getElementById('dayNoteInput').value = dayNotes[dateStr] || '';
   renderDayList();
   dayOverlay.classList.add('show');
@@ -2083,6 +2524,8 @@ document.getElementById('btnClearAll').onclick = async ()=>{
 
 /* ================= MASTER RENDER ================= */
 function renderAll(){
+  ensureHolidays(new Date().getFullYear());
+  distinctYears().forEach(y=>ensureHolidays(y));
   renderYearOptions();
   renderStats();
   renderTodayStrip();
