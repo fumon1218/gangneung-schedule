@@ -236,6 +236,18 @@
     .cal-dow{ font-size:10px; }
     .cal-head h3{ font-size:16px; }
   }
+
+  /* ===== 에듀 스케줄러(수업 시간표) 연동 표시 — 읽기 전용 ===== */
+  :root{ --edu:#4f46e5; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --edu:#a5b4fc; } }
+  .cal-item.edu{ background:color-mix(in srgb, var(--edu) 14%, transparent); color:var(--edu); }
+  .edu-section{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border-strong); }
+  .edu-section h4{ margin:0 0 8px; font-size:12.5px; color:var(--edu); }
+  .edu-item{ display:flex; gap:8px; align-items:flex-start; border:1px solid color-mix(in srgb, var(--edu) 35%, transparent); background:color-mix(in srgb, var(--edu) 10%, transparent); border-radius:10px; padding:8px 10px; font-size:12.5px; margin-bottom:6px; }
+  .edu-item .t{ font-weight:800; white-space:nowrap; color:var(--edu); }
+  .edu-item .grow{ flex:1; min-width:0; }
+  .edu-item .grow b{ display:block; font-size:13px; }
+  .edu-item .grow span{ color:var(--text-dim); font-size:11.5px; }
 </style>
 </head>
 <body>
@@ -253,12 +265,14 @@
       <button class="btn" id="btnMyRooms">⭐ 내 담당 실</button>
       <button class="btn danger" id="btnReset">초기 데이터로 재설정</button>
       <button class="btn danger" id="btnClearAll">🗑 전체 비우기</button>
+      <a class="btn" id="btnEduLink" href="https://fumon1218.github.io/edu-scheduler-premium/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;" title="교육원 수업 시간표(에듀 스케줄러) 열기">📚 에듀 스케줄러 열기</a>
     </div>
   </div>
 
   <div class="card banner no-print">
     <div class="left">
       <span class="badge" id="collabBadge">⏳ 공유 저장소 확인 중...</span>
+      <span class="badge" id="eduBadge" style="background:var(--accent-dim); color:var(--text-dim);">📚 교육원 수업 연동 확인 중...</span>
       <span class="note">일정·구분(학교급)·인원수를 표에서 바로 수정하거나 상단 <b>＋ 일정 추가</b> 버튼으로 새 일정을 등록할 수 있습니다.</span>
     </div>
     <div class="stats">
@@ -442,6 +456,10 @@
       </div>
     </div>
     <div class="daymodal-list" id="dayList"></div>
+    <div class="edu-section" id="dayEduSection" style="display:none;">
+      <h4>📚 교육원 수업 (에듀 스케줄러 연동 · 읽기 전용)</h4>
+      <div id="dayEduList"></div>
+    </div>
     <div class="modal-ops">
       <button class="btn" id="btnCloseDay">닫기</button>
       <button class="btn primary" id="btnAddInDay">＋ 이 날짜에 일정 추가</button>
@@ -899,6 +917,78 @@ const FIREBASE_CONFIG = {
 const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
 let collabBackend = null; // 'claude' | 'firebase'
 
+/* ================= 에듀 스케줄러(수업 시간표) 연동 — 읽기 전용 =================
+   에듀 스케줄러에 관리자가 접속해 있는 동안, 수업 일정이 이 Firebase의 eduSchedules 컬렉션에 복사됩니다.
+   여기서는 그것을 읽어서 "같은 날·같은 실·같은 시간대에 교육원 수업이 있는지"만 보여주며, 수정은 에듀 스케줄러에서 합니다.
+   (Firebase 공유 저장소를 쓸 때만 동작합니다. claude.ai 안에서 열었을 때는 꺼져 있습니다) */
+let eduClasses = []; // { id, date, day, startTime, endTime, program, location, roomId, target, teacher? }
+
+function setEduBadge(mode, why){
+  const el = document.getElementById('eduBadge');
+  if(!el) return;
+  if(mode==='ok'){
+    el.textContent = eduClasses.length ? `📚 교육원 수업 연동 중 · ${eduClasses.length}건` : '📚 교육원 수업 연동 중 · 아직 받은 수업 없음';
+    el.style.background = 'var(--green-dim)'; el.style.color = 'var(--green)';
+  }else if(mode==='error'){
+    el.textContent = why==='perm' ? '⚠️ 교육원 수업 연동 권한 오류 (Firebase 규칙에 eduSchedules 추가 필요)' : '⚠️ 교육원 수업 연동 오류';
+    el.style.background = 'var(--danger-dim)'; el.style.color = 'var(--danger)';
+  }else if(mode==='connecting'){
+    el.textContent = '📚 교육원 수업 연동 확인 중...';
+    el.style.background = 'var(--accent-dim)'; el.style.color = 'var(--accent)';
+  }else{
+    el.textContent = '📚 교육원 수업 연동은 공유 저장소(Firebase)에 연결됐을 때만 동작합니다';
+    el.style.background = 'var(--accent-dim)'; el.style.color = 'var(--text-dim)';
+  }
+}
+
+function tmin(t){ const m = /^(\d{1,2}):(\d{2})$/.exec(String(t||'').trim()); return m ? Number(m[1])*60 + Number(m[2]) : NaN; }
+// 수업 시간(시작~종료)이 오전/오후 중 어느 쪽에 걸치는지 (12:00 기준). 에듀 스케줄러 쪽 계산과 같은 규칙입니다.
+function eduClassSessions(c){
+  const s = tmin(c.startTime); let e = tmin(c.endTime);
+  if(!isFinite(s)) return [];
+  if(!isFinite(e) || e<=s) e = s+1;
+  const out = [];
+  if(s < 720) out.push('AM');
+  if(e > 720) out.push('PM');
+  return out;
+}
+function eduClassesFor(date, roomId, session){
+  return eduClasses
+    .filter(c=>c.date===date && c.roomId && c.roomId===roomId && eduClassSessions(c).includes(session))
+    .sort((a,b)=>String(a.startTime).localeCompare(String(b.startTime)));
+}
+function eduPlaceName(c){ return c.roomId ? roomOf(c.roomId).name : (c.location||''); }
+function fmtEduClass(c){
+  return `${c.startTime||''}${c.endTime?'~'+c.endTime:''} ${c.program||'(프로그램 미입력)'} · ${eduPlaceName(c)}`;
+}
+function renderDayEduList(){
+  const sec = document.getElementById('dayEduSection');
+  const box = document.getElementById('dayEduList');
+  if(!sec || !box) return;
+  const list = eduClasses.filter(c=>c.date===currentDay).sort((a,b)=>String(a.startTime).localeCompare(String(b.startTime)));
+  if(!list.length){ sec.style.display = 'none'; box.innerHTML = ''; return; }
+  sec.style.display = '';
+  box.innerHTML = list.map(c=>`<div class="edu-item">
+    <span class="t">${escapeHtml(c.startTime||'')}${c.endTime?'~'+escapeHtml(c.endTime):''}</span>
+    <div class="grow"><b>${escapeHtml(c.program||'(프로그램 미입력)')}</b><span>${escapeHtml(eduPlaceName(c))}${c.target?' · '+escapeHtml(c.target):''}${c.teacher?' · '+escapeHtml(c.teacher):''}</span></div>
+  </div>`).join('');
+}
+function subscribeEduDb(){
+  setEduBadge('connecting');
+  dbApi.collection('eduSchedules').onSnapshot(snap=>{
+    try{
+      eduClasses = snap.docs.map(d=>({ id:d.id, ...d.data() })).filter(c=>c && c.date);
+      setEduBadge('ok');
+      if(state.tab==='calendar') renderCalendar();
+      if(dayOverlay.classList.contains('show')) renderDayEduList();
+    }catch(e){ console.error('edu snapshot handling failed', e); }
+  }, err=>{
+    // 에듀 연동은 부가 기능이므로, 실패해도 저장 오류 팝업(reportDbError)은 띄우지 않고 배지로만 알립니다.
+    console.warn('eduSchedules snapshot error', err);
+    setEduBadge('error', err && err.code==='permission-denied' ? 'perm' : 'net');
+  });
+}
+
 async function initCollab(){
   setCollabBadge('connecting');
   try{
@@ -918,11 +1008,16 @@ async function initCollab(){
     }
   }catch(e){ dbApi = null; collabBackend = null; console.warn('collab init failed', e); }
 
-  if(!dbApi){ setCollabBadge('local'); dbAvailable = false; return; }
+  if(!dbApi){ setCollabBadge('local'); setEduBadge('off'); dbAvailable = false; return; }
   dbAvailable = true;
   [subscribeEntriesDb, subscribeRoomsDb, subscribeTemplatesDb, subscribeDayNotesDb].forEach(fn=>{
     try{ fn(); }catch(e){ console.warn('subscribe failed', fn.name, e); }
   });
+  if(collabBackend === 'firebase'){
+    try{ subscribeEduDb(); }catch(e){ console.warn('edu link subscribe failed', e); setEduBadge('error','net'); }
+  }else{
+    setEduBadge('off');
+  }
 
   if(collabBackend === 'claude'){
     try{
@@ -1454,6 +1549,11 @@ function renderCalendar(){
       if(state.sess!=='all' && e.session!==state.sess) return false;
       return true;
     });
+    const eduDay = eduClasses.filter(c=>c.date===dateStr).filter(c=>{
+      if(state.room!=='all' && c.roomId!==state.room) return false;
+      if(state.sess!=='all' && !eduClassSessions(c).includes(state.sess)) return false;
+      return true;
+    });
     const total = allDayEntries.reduce((s,e)=>s+Number(e.count),0);
     const dow = (startDow + d - 1) % 7;
     const shown = allDayEntries.slice(0,3);
@@ -1465,7 +1565,8 @@ function renderCalendar(){
       ${note?`<div class="cal-item" style="background:#fde68a; color:#92400e; font-weight:800;" title="${escapeHtml(note)}">📌 ${escapeHtml(note)}</div>`:''}
       ${shown.map(e=>{const r=roomOf(e.room); return `<div class="cal-item" style="background:color-mix(in srgb, ${r.color} 18%, transparent); color:${r.color};">${escapeHtml(e.org)} ${e.count}명</div>`;}).join('')}
       ${more>0?`<div class="cal-more">+${more}건 더보기</div>`:''}
-      ${allDayEntries.length===0 && !note?`<div class="cal-empty-label">일정 없음</div>`:''}
+      ${eduDay.length?`<div class="cal-item edu" title="${escapeHtml(eduDay.map(fmtEduClass).join('\n'))}">📚 교육원 수업 ${eduDay.length}건</div>`:''}
+      ${allDayEntries.length===0 && !note && eduDay.length===0?`<div class="cal-empty-label">일정 없음</div>`:''}
     </div>`;
   }
   grid.innerHTML = dowRow + cells;
@@ -1857,6 +1958,19 @@ document.getElementById('btnSaveEdit').onclick = async ()=>{
     count: Number(document.getElementById('f_count').value)||0,
     note: document.getElementById('f_note').value.trim()
   };
+  // 같은 날짜·같은 실·같은 시간대에 에듀 스케줄러 수업이 이미 있으면 알려주고 저장할지 묻습니다. (날짜·실·시간대가 바뀐 경우에만)
+  const prevEntry = id ? entries.find(x=>x.id===id) : null;
+  const slotChanged = !prevEntry || prevEntry.date!==data.date || prevEntry.room!==data.room || prevEntry.session!==data.session;
+  if(slotChanged){
+    const clash = eduClassesFor(data.date, data.room, data.session);
+    if(clash.length){
+      const goOn = await askConfirm(
+        `같은 날짜·같은 실·같은 시간대(${data.session==='AM'?'오전':'오후'})에 에듀 스케줄러 수업이 이미 있습니다.\n\n${clash.map(fmtEduClass).join('\n')}\n\n같은 일정이거나 함께 진행하는 것이라면 그대로 저장하세요.`,
+        {okText:'그대로 저장', title:'교육원 수업과 같은 시간대입니다'}
+      );
+      if(!goOn) return;
+    }
+  }
   if(id){
     const idx = entries.findIndex(x=>x.id===id);
     entries[idx] = {...entries[idx], ...data};
@@ -1910,6 +2024,7 @@ function renderDayList(){
       <button class="btn small danger" onclick="removeEntryFromDay('${e.id}')">삭제</button>
     </div>`;
   }).join('') : `<div style="text-align:center; color:var(--text-faint); padding:20px 0;">등록된 일정이 없습니다.</div>`;
+  renderDayEduList();
 }
 function closeDayThenEdit(id){ dayOverlay.classList.remove('show'); openEdit(id); }
 async function removeEntryFromDay(id){ await removeEntry(id); renderDayList(); }
