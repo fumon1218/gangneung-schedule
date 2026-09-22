@@ -357,6 +357,7 @@
     </div>
     <div class="actions-top no-print">
       <button class="btn icon" id="btnTheme" title="라이트/다크 모드 전환">🌙</button>
+      <button class="btn small" id="btnEditLock" title="보기는 누구나 가능합니다. 추가·수정·삭제하려면 비밀번호가 필요합니다.">🔒 편집 잠금</button>
       <button class="btn primary" id="btnAdd">＋ 일정 추가</button>
       <button class="btn" id="btnPrintTop">🖨 인쇄 / PDF</button>
       <button class="btn" id="btnExportCsv">📥 CSV 다운로드</button>
@@ -373,6 +374,7 @@
     <div class="left">
       <span class="badge" id="collabBadge">⏳ 공유 저장소 확인 중...</span>
       <span class="badge" id="eduBadge" style="background:var(--accent-dim); color:var(--text-dim);">📚 교육원 수업 연동 확인 중...</span>
+      <span class="badge" id="editLockBadge" style="display:none;"></span>
       <span class="note">일정·구분(학교급)·인원수를 표에서 바로 수정하거나 상단 <b>＋ 일정 추가</b> 버튼으로 새 일정을 등록할 수 있습니다.</span>
     </div>
     <div class="stats">
@@ -632,12 +634,13 @@ function openConfirmModal(opts){
   confirmQueue = p.catch(()=>{});
   return p;
 }
-function showConfirmModal({title='확인', message='', isPrompt=false, defaultValue='', okText='확인', danger=false, hideCancel=false}){
+function showConfirmModal({title='확인', message='', isPrompt=false, defaultValue='', okText='확인', danger=false, hideCancel=false, mask=false}){
   return new Promise(resolve=>{
     confirmState = { resolve, isPrompt };
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmMessage').textContent = message;
     document.getElementById('confirmInputWrap').style.display = isPrompt ? 'block' : 'none';
+    document.getElementById('confirmInput').type = mask ? 'password' : 'text';
     document.getElementById('confirmInput').value = defaultValue;
     document.getElementById('confirmCancelBtn').style.display = hideCancel ? 'none' : 'inline-flex';
     const okBtn = document.getElementById('confirmOkBtn');
@@ -661,11 +664,148 @@ document.getElementById('confirmInput').addEventListener('keydown', e=>{ if(e.ke
 async function askConfirm(message, opts={}){
   return await openConfirmModal({message, isPrompt:false, danger:opts.danger, okText:opts.okText||'확인', title:opts.title||'확인'});
 }
-async function askPrompt(message, defaultValue=''){
-  return await openConfirmModal({message, isPrompt:true, defaultValue, okText:'추가', title:'입력'});
+async function askPrompt(message, defaultValue='', opts={}){
+  return await openConfirmModal({message, isPrompt:true, defaultValue, okText:opts.okText||'추가', title:opts.title||'입력', mask:opts.mask});
 }
 async function askAlert(message, opts={}){
   await openConfirmModal({message, isPrompt:false, hideCancel:true, okText:'확인', title:opts.title||'알림', danger:opts.danger});
+}
+
+/* ================= 편집 잠금 (나만 일정 추가/수정/삭제) =================
+   보기는 누구나 할 수 있지만, 추가·수정·삭제는 비밀번호를 아는 사람만 할 수 있습니다.
+   비밀번호 원문은 저장하지 않고 SHA-256 해시만 저장합니다.
+   (완전한 보안 장치는 아니며, 링크를 아는 다른 사람이 실수로 또는 무심코
+    일정을 건드리는 것을 막는 정도의 보호입니다) */
+const EDIT_UNLOCK_KEY = 'gnEditUnlockedV1';
+let editUnlocked = false;
+try{ editUnlocked = localStorage.getItem(EDIT_UNLOCK_KEY) === '1'; }catch(e){}
+
+async function sha256Hex(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function randomSalt(){
+  return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function updateEditLockUI(){
+  const btn = document.getElementById('btnEditLock');
+  if(btn){
+    if(editUnlocked){
+      btn.textContent = '🔓 편집 가능';
+      btn.title = '지금 이 브라우저에서 일정을 추가·수정·삭제할 수 있습니다. 클릭하면 잠급니다.';
+      btn.classList.add('primary');
+    }else{
+      btn.textContent = '🔒 편집 잠금';
+      btn.title = '보기는 누구나 가능합니다. 추가·수정·삭제하려면 비밀번호가 필요합니다.';
+      btn.classList.remove('primary');
+    }
+  }
+  refreshEditLockBadge();
+}
+
+// 공유 저장소(또는, 연결이 안 된 경우 이 브라우저)에 저장된 편집 비밀번호 해시를 가져옵니다.
+// 반환값: {hash, salt} 있으면 설정됨 / null이면 아직 미설정 / undefined면 읽기 자체에 실패(오프라인 등)
+async function getEditLockDoc(){
+  if(dbApi && collabBackend==='firebase'){
+    try{
+      const doc = await dbApi.collection('branchSettings').doc('editLock').get();
+      return doc.exists ? doc.data() : null;
+    }catch(e){ console.warn('editLock read failed', e); return undefined; }
+  }
+  try{ const raw = localStorage.getItem('gnEditLockLocalV1'); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+async function saveEditLockDoc(data){
+  if(dbApi && collabBackend==='firebase'){
+    await dbApi.collection('branchSettings').doc('editLock').set(data);
+  }else{
+    localStorage.setItem('gnEditLockLocalV1', JSON.stringify(data));
+  }
+}
+
+function unlockEditing(){
+  editUnlocked = true;
+  try{ localStorage.setItem(EDIT_UNLOCK_KEY, '1'); }catch(e){}
+  updateEditLockUI();
+}
+function lockEditing(){
+  editUnlocked = false;
+  try{ localStorage.removeItem(EDIT_UNLOCK_KEY); }catch(e){}
+  updateEditLockUI();
+}
+
+async function setupEditLock(){
+  const pw1 = await askPrompt('앞으로 일정을 추가·수정·삭제할 때 쓸 비밀번호를 정해주세요. (4자 이상)', '', {mask:true, title:'편집 비밀번호 설정', okText:'다음'});
+  if(pw1 === null) return false;
+  if(pw1.trim().length < 4){ await askAlert('비밀번호는 4자 이상으로 설정해주세요.'); return false; }
+  const pw2 = await askPrompt('확인을 위해 한 번 더 입력해주세요.', '', {mask:true, title:'편집 비밀번호 확인', okText:'설정'});
+  if(pw2 === null) return false;
+  if(pw1 !== pw2){ await askAlert('입력한 비밀번호가 서로 다릅니다. 처음부터 다시 시도해주세요.'); return false; }
+  const salt = randomSalt();
+  const hash = await sha256Hex(salt + pw1);
+  try{
+    await saveEditLockDoc({ hash, salt, updatedAt: Date.now() });
+  }catch(e){
+    console.warn('editLock save failed', e);
+    await askAlert('비밀번호 저장에 실패했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.');
+    return false;
+  }
+  unlockEditing();
+  await askAlert('편집 비밀번호가 설정되었습니다.\n이제부터 이 비밀번호를 아는 사람만 일정을 추가·수정·삭제할 수 있습니다.\n\n(설정 화면은 따로 없으니, 비밀번호는 꼭 기억해두거나 믿을 수 있는 곳에 적어두세요)');
+  return true;
+}
+
+// 일정을 추가·수정·삭제하는 모든 동작의 맨 앞에서 이것을 호출합니다.
+// 이미 이 브라우저에서 잠금 해제된 상태면 바로 true를 돌려줍니다.
+async function requireEdit(){
+  if(editUnlocked) return true;
+  const lock = await getEditLockDoc();
+  if(lock === undefined){
+    await askAlert('편집 잠금 정보를 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.');
+    return false;
+  }
+  if(!lock){
+    const ok = await askConfirm(
+      '아직 편집 비밀번호가 설정되지 않았습니다.\n지금 설정하면, 이 비밀번호를 아는 사람만 앞으로 일정을 추가·수정·삭제할 수 있습니다.',
+      {okText:'지금 설정하기', title:'편집 비밀번호 설정'}
+    );
+    if(!ok) return false;
+    return await setupEditLock();
+  }
+  const pw = await askPrompt('편집 비밀번호를 입력해주세요.', '', {mask:true, title:'편집 비밀번호', okText:'확인'});
+  if(pw === null) return false;
+  const hash = await sha256Hex(lock.salt + pw);
+  if(hash !== lock.hash){
+    await askAlert('비밀번호가 올바르지 않습니다.');
+    return false;
+  }
+  unlockEditing();
+  return true;
+}
+
+document.getElementById('btnEditLock').onclick = async ()=>{
+  if(editUnlocked){ lockEditing(); return; }
+  await requireEdit();
+};
+
+// 상단 안내 배지: 비밀번호가 아직 설정되지 않았으면 모두에게 알려서, 주인이 서둘러 설정하도록 합니다.
+async function refreshEditLockBadge(){
+  const el = document.getElementById('editLockBadge');
+  if(!el) return;
+  if(editUnlocked){
+    el.style.display = '';
+    el.textContent = '🔓 이 브라우저는 편집 가능 상태입니다';
+    el.style.background = 'var(--accent-dim)'; el.style.color = 'var(--accent)';
+    return;
+  }
+  const lock = await getEditLockDoc();
+  if(lock === null){
+    el.style.display = '';
+    el.textContent = '⚠️ 편집 비밀번호 미설정 — 아무나 설정할 수 있어요';
+    el.style.background = 'var(--danger-dim)'; el.style.color = 'var(--danger)';
+  }else{
+    el.style.display = 'none';
+  }
 }
 
 /* ================= ROOM DEFINITIONS ================= */
@@ -758,21 +898,11 @@ async function deleteTemplate(id){
   dbDeleteTemplate(id);
   renderTemplateChips();
 }
-let templatesFirstSnap = true;
 function subscribeTemplatesDb(){
   dbApi.collection('templates').onSnapshot(snap=>{
     try{
-      const cloud = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-      if(templatesFirstSnap){
-        // 처음 연결될 때: 이 브라우저에만 있던 템플릿은 지우지 않고 공유 저장소에 올려서 보존합니다.
-        templatesFirstSnap = false;
-        const cloudIds = new Set(cloud.map(t=>t.id));
-        const localOnly = templates.filter(t=>!cloudIds.has(t.id));
-        localOnly.forEach(t=>dbSetTemplate(t));
-        templates = [...cloud, ...localOnly];
-      }else{
-        templates = cloud;
-      }
+      // 공유 저장소가 유일한 정답입니다. (이유는 subscribeEntriesDb 주석 참고)
+      templates = snap.docs.map(d=>({ id:d.id, ...d.data() }));
       persistTemplates();
       renderTemplateChips();
     }catch(e){ console.error('templates snapshot handling failed', e); }
@@ -784,19 +914,12 @@ const DAY_NOTES_KEY = 'gnBranchDayNotesV1';
 let dayNotes = {};
 try{ dayNotes = JSON.parse(localStorage.getItem(DAY_NOTES_KEY) || '{}'); }catch(e){ dayNotes = {}; }
 function persistDayNotes(){ try{ localStorage.setItem(DAY_NOTES_KEY, JSON.stringify(dayNotes)); }catch(e){} }
-let dayNotesFirstSnap = true;
 function subscribeDayNotesDb(){
   dbApi.collection('dayNotes').onSnapshot(snap=>{
     try{
+      // 공유 저장소가 유일한 정답입니다. (이유는 subscribeEntriesDb 주석 참고)
       const next = {};
       snap.docs.forEach(d=>{ const data=d.data(); if(data && data.text) next[d.id] = data.text; });
-      if(dayNotesFirstSnap){
-        // 처음 연결될 때: 이 브라우저에만 있던 날짜별 공지는 공유 저장소에 올려서 보존합니다.
-        dayNotesFirstSnap = false;
-        Object.keys(dayNotes).forEach(date=>{
-          if(!(date in next) && dayNotes[date]){ next[date] = dayNotes[date]; dbSetDayNote(date, dayNotes[date]); }
-        });
-      }
       dayNotes = next;
       persistDayNotes();
       if(state.tab==='calendar') renderCalendar();
@@ -934,66 +1057,28 @@ async function seedEntriesToDb(){
   await chunkedSet(pairs);
 }
 
-let entriesFirstSnap = true;
 function subscribeEntriesDb(){
   dbApi.collection('entries').onSnapshot(snap=>{
     try{
-      const isFirst = entriesFirstSnap;
-      entriesFirstSnap = false;
       if(snap.empty){
         if(!entriesSeeded){ entriesSeeded = true; seedEntriesToDb(); }
         return;
       }
-      const cloud = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-      // 처음 연결될 때, 이 브라우저에만 있고 공유 저장소에는 없는 일정이 있으면 그냥 덮어써서 없애지 않고 물어봅니다.
-      const cloudIds = new Set(cloud.map(e=>e.id));
-      const localOnly = isFirst ? entries.filter(e=>!cloudIds.has(e.id)) : [];
-      entries = cloud;
+      // 공유 저장소(클라우드)가 유일한 정답입니다. 이 브라우저의 캐시는 항상 그대로 따라갑니다.
+      // (예전엔 "이 브라우저에만 있는 일정"을 자동으로 다시 올려주는 기능이 있었는데, 다른 기기의
+      //  낡은 캐시가 이미 삭제된 일정을 계속 되살리는 원인이 되어 없앴습니다.)
+      entries = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      persist();
       renderAll();
-      if(localOnly.length) offerUploadLocalEntries(localOnly);
     }catch(e){ console.error('entries snapshot handling failed', e); }
   }, err=>reportDbError('entries snapshot error', err));
 }
 
-async function offerUploadLocalEntries(localOnly){
-  const ok = await askConfirm(
-    `이 브라우저에만 저장되어 있고 공유 저장소에는 없는 일정이 ${localOnly.length}건 있습니다.\n공유 저장소에 올려서 다른 기기에서도 보이게 할까요?\n\n(다른 사람이 이미 지운 일정이 남아 있는 것이라면 '취소'를 눌러주세요)`,
-    {okText:'올리기', title:'공유 저장소에 올리기'}
-  );
-  if(!ok) return;
-  // 이 일정들이 쓰는 사용자 추가 프로그램실이 사라졌다면 함께 되살려서 올립니다.
-  bootCustomRooms.forEach(r=>{
-    if(localOnly.some(e=>e.room===r.id) && !roomMap[r.id]){ customRooms.push(r); }
-  });
-  rebuildRooms(); persistCustomRooms();
-  customRooms.forEach(r=>{ if(localOnly.some(e=>e.room===r.id)) dbSetRoom(r); });
-  renderRoomOptions(); fillRoomSelect();
-  localOnly.forEach(e=>{ if(!entries.some(x=>x.id===e.id)) entries.push(e); });
-  persist();
-  renderAll();
-  await chunkedSet(localOnly.map(e=>({
-    ref: dbApi.collection('entries').doc(e.id),
-    data: { date:e.date, session:e.session, room:e.room, org:e.org, count:Number(e.count)||0, note:e.note||'' }
-  })));
-  if(!dbErrorShown) await askAlert(`${localOnly.length}건을 공유 저장소에 올렸습니다.`);
-}
-
-let roomsFirstSnap = true;
 function subscribeRoomsDb(){
   dbApi.collection('customRooms').onSnapshot(snap=>{
     try{
-      const cloud = snap.docs.map(d=>({ id:d.id, custom:true, ...d.data() }));
-      if(roomsFirstSnap){
-        // 처음 연결될 때: 이 브라우저에만 있던 사용자 추가 프로그램실은 공유 저장소에 올려서 보존합니다.
-        // (그렇지 않으면 그 프로그램실을 쓰던 일정들이 '미등록 프로그램'이 됩니다)
-        roomsFirstSnap = false;
-        const cloudIds = new Set(cloud.map(r=>r.id));
-        const localOnly = customRooms.filter(r=>!cloudIds.has(r.id));
-        localOnly.forEach(r=>dbSetRoom(r));
-        customRooms = [...cloud, ...localOnly];
-      }else{
-        customRooms = cloud;
-      }
+      // 공유 저장소가 유일한 정답입니다. (이유는 subscribeEntriesDb 주석 참고)
+      customRooms = snap.docs.map(d=>({ id:d.id, custom:true, ...d.data() }));
       persistCustomRooms();
       rebuildRooms();
       renderRoomOptions();
@@ -1437,6 +1522,7 @@ document.getElementById('csvFileInput').addEventListener('change', async (e)=>{
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   if(!file) return;
+  if(!(await requireEdit())) return;
   let text;
   try{ text = await file.text(); }catch(err){ await askAlert('파일을 읽을 수 없습니다.'); return; }
   const { valid, skipped, total, reasons } = parseImportRows(text);
@@ -1843,11 +1929,12 @@ async function runLocSearch(){
     box.innerHTML = '<div class="loc-msg">카카오맵을 불러오지 못해 검색할 수 없습니다. (도메인 등록 또는 키를 확인해 주세요)</div>';
   }
 }
-document.getElementById('locResults').addEventListener('click', ev=>{
+document.getElementById('locResults').addEventListener('click', async ev=>{
   const b = ev.target.closest && ev.target.closest('button[data-i]');
   if(!b) return;
   const r = locSearchResults[Number(b.dataset.i)];
   if(!r) return;
+  if(!(await requireEdit())) return;
   applyLocation({ label:r.place_name, address:r.road_address_name || r.address_name || '', lat:parseFloat(r.y), lng:parseFloat(r.x) }, true);
   document.getElementById('locResults').innerHTML = '';
   document.getElementById('locQuery').value = '';
@@ -2348,7 +2435,8 @@ document.getElementById('btnDeleteRoom').onclick = async ()=>{
   document.getElementById('f_room').value = ROOMS[0].id;
   updateRoomDeleteBtn();
 };
-function openAdd(prefDate){
+async function openAdd(prefDate){
+  if(!(await requireEdit())) return;
   renderTemplateChips();
   document.getElementById('editTitle').textContent = '일정 추가';
   document.getElementById('editId').value = '';
@@ -2361,7 +2449,8 @@ function openAdd(prefDate){
   updateRoomDeleteBtn();
   overlay.classList.add('show');
 }
-function openEdit(id){
+async function openEdit(id){
+  if(!(await requireEdit())) return;
   renderTemplateChips();
   const e = entries.find(x=>x.id===id); if(!e) return;
   document.getElementById('editTitle').textContent = '일정 수정';
@@ -2383,8 +2472,9 @@ function openEdit(id){
 }
 function closeEdit(){ overlay.classList.remove('show'); }
 document.getElementById('btnCancelEdit').onclick = closeEdit;
-document.getElementById('btnAdd').onclick = ()=>openAdd();
+document.getElementById('btnAdd').onclick = ()=>openAdd();  // openAdd 안에서 잠금을 확인합니다
 document.getElementById('btnSaveEdit').onclick = async ()=>{
+  if(!(await requireEdit())) return;
   const id = document.getElementById('editId').value;
   const date = document.getElementById('f_date').value;
   const org = document.getElementById('f_org').value.trim();
@@ -2426,6 +2516,7 @@ document.getElementById('btnSaveEdit').onclick = async ()=>{
   renderAll();
 };
 async function removeEntry(id){
+  if(!(await requireEdit())) return;
   const ok = await askConfirm('이 일정을 삭제할까요?', {danger:true, okText:'삭제'});
   if(!ok) return;
   entries = entries.filter(e=>e.id!==id);
@@ -2445,7 +2536,8 @@ function openDay(dateStr){
   renderDayList();
   dayOverlay.classList.add('show');
 }
-document.getElementById('btnSaveDayNote').onclick = ()=>{
+document.getElementById('btnSaveDayNote').onclick = async ()=>{
+  if(!(await requireEdit())) return;
   const text = document.getElementById('dayNoteInput').value.trim();
   if(text){ dayNotes[currentDay] = text; dbSetDayNote(currentDay, text); }
   else{ delete dayNotes[currentDay]; dbDeleteDayNote(currentDay); }
@@ -2470,7 +2562,7 @@ function renderDayList(){
 function closeDayThenEdit(id){ dayOverlay.classList.remove('show'); openEdit(id); }
 async function removeEntryFromDay(id){ await removeEntry(id); renderDayList(); }
 document.getElementById('btnCloseDay').onclick = ()=>dayOverlay.classList.remove('show');
-document.getElementById('btnAddInDay').onclick = ()=>{ dayOverlay.classList.remove('show'); openAdd(currentDay); };
+document.getElementById('btnAddInDay').onclick = async ()=>{ if(!(await requireEdit())) return; dayOverlay.classList.remove('show'); openAdd(currentDay); };
 
 /* ================= PRINT / RESET ================= */
 function doPrint(){ window.print(); }
@@ -2484,6 +2576,7 @@ document.getElementById('btnPrintTop').onclick = ()=>{
 };
 document.getElementById('btnPrintNow').onclick = doPrint;
 document.getElementById('btnReset').onclick = async ()=>{
+  if(!(await requireEdit())) return;
   const msg = dbAvailable
     ? '⚠️ 이 데이터는 조직 전체와 실시간 공유되고 있습니다. 정말 모든 직원의 수정 내용을 지우고 원본 데이터로 되돌릴까요? 이 작업은 되돌릴 수 없습니다.'
     : '모든 수정 내용을 지우고 원본 데이터로 되돌릴까요? 이 작업은 되돌릴 수 없습니다.';
@@ -2505,6 +2598,7 @@ document.getElementById('btnReset').onclick = async ()=>{
   }
 };
 document.getElementById('btnClearAll').onclick = async ()=>{
+  if(!(await requireEdit())) return;
   const msg = dbAvailable
     ? '⚠️ 예시 데이터를 포함한 모든 일정을 완전히 삭제해서 빈 상태로 만듭니다. 이 작업은 되돌릴 수 없습니다.\n(다른 곳에서 CSV로 내보낸 데이터를 깨끗하게 새로 불러올 때 사용하세요)'
     : '모든 일정을 완전히 삭제해서 빈 상태로 만들까요? 되돌릴 수 없습니다.';
@@ -2542,6 +2636,7 @@ renderYearOptions();
 renderMonthOptions();
 fillRoomSelect();
 updateMyRoomsToggleBtn();
+updateEditLockUI();
 try{ renderAll(); }catch(e){ console.error('초기 화면 표시 중 오류', e); }
 initCollab().catch(e=>{
   console.error('initCollab failed', e);
