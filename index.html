@@ -2015,8 +2015,11 @@ function weatherLinkFor(dateStr){
 function weatherBadge(e){
   if(e.room!=='upcycle') return '';
   const w = weatherMap[e.date];
-  const label = w ? `${weatherEmoji(w.code)} ${Math.round(w.tMax)}°${w.pop!=null && w.pop>=40 ? ` ☔${w.pop}%` : ''}` : '🌤️';
-  const tip = w ? `${wxTitle(w)} — 야외활동 실입니다. 클릭하면 네이버 날씨(새 창)` : '강릉 날씨 확인 (새 창, 야외활동 실이라 날씨를 확인해보세요)';
+  // 실제 기상 API(Open-Meteo)가 그 날짜의 예보를 갖고 있을 때만 표시합니다.
+  // 예보 범위(대략 16일) 밖이라 데이터가 없으면 가짜 아이콘을 보여주지 않고 아무것도 표시하지 않습니다.
+  if(!w) return '';
+  const label = `${weatherEmoji(w.code)} ${Math.round(w.tMax)}°${w.pop!=null && w.pop>=40 ? ` ☔${w.pop}%` : ''}`;
+  const tip = `${wxTitle(w)} — 야외활동 실입니다. 클릭하면 네이버 날씨(새 창)`;
   return `<a href="${weatherLinkFor(e.date)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(tip)}" style="margin-left:6px; text-decoration:none; font-size:12.5px; font-weight:600; color:var(--text-dim);" onclick="event.stopPropagation();">${label}</a>`;
 }
 function renderTable(){
@@ -2074,12 +2077,11 @@ function renderCalendar(){
     const shown = allDayEntries.slice(0,3);
     const more = allDayEntries.length - shown.length;
     const note = dayNotes[dateStr];
-    const hasUpcycle = allDayEntries.some(e=>e.room==='upcycle');
     const hol = holidayMap[dateStr];
     const wx = weatherMap[dateStr];
     const isToday = dateStr===todayStr();
     cells += `<div class="cal-day${isToday?' today':''}${hol?' holiday':''}" onclick="openDay('${dateStr}')">
-      <div class="dnum ${(dow===0||hol)?'sun':dow===6?'sat':''}"><span class="dn-left"><span class="dn${isToday?' is-today':''}">${d}</span>${isToday?'<span class="today-tag">오늘</span>':''}${wx?`<span class="cal-wx" title="${escapeHtml(wxTitle(wx))}">${weatherEmoji(wx.code)}<i>${Math.round(wx.tMax)}°</i></span>`:(hasUpcycle?'<span class="cal-wx">🌤️</span>':'')}</span>${total?`<span class="cal-count">👥${total}</span>`:''}</div>
+      <div class="dnum ${(dow===0||hol)?'sun':dow===6?'sat':''}"><span class="dn-left"><span class="dn${isToday?' is-today':''}">${d}</span>${isToday?'<span class="today-tag">오늘</span>':''}${wx?`<span class="cal-wx" title="${escapeHtml(wxTitle(wx))}">${weatherEmoji(wx.code)}<i>${Math.round(wx.tMax)}°</i></span>`:''}</span>${total?`<span class="cal-count">👥${total}</span>`:''}</div>
       ${hol?`<div class="cal-hol" title="${escapeHtml(hol)}">${escapeHtml(hol)}</div>`:''}
       ${note?`<div class="cal-item" style="background:#fde68a; color:#92400e; font-weight:800;" title="${escapeHtml(note)}">📌 ${escapeHtml(note)}</div>`:''}
       ${shown.map(e=>{const r=roomOf(e.room); return `<div class="cal-item" style="background:color-mix(in srgb, ${r.color} 18%, transparent); color:${r.color};">${escapeHtml(e.org)} ${e.count}명</div>`;}).join('')}
